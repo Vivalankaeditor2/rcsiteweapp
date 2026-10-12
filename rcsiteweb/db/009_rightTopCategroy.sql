@@ -1,0 +1,6 @@
+INSERT INTO `rcsite_config` (`config_key`, `value`, `description`, `site_area`, `active`, `hot_configurable`) VALUES ('rightTopCategroy.AUS', 'wp.50', 'communty events- Ausi', 'web', '1', '1');
+INSERT INTO `rcsite_config` (`config_key`, `value`, `description`, `site_area`, `active`, `hot_configurable`) VALUES ('rightTopCategroy.CA', 'wp.24', 'comunity event canada', 'web', '1', '1');
+INSERT INTO `rcsite_config` (`config_key`, `value`, `description`, `site_area`, `active`, `hot_configurable`) VALUES ('rightTopCategroy.default', 'wp.23', 'comunty events defaults catid', 'web', '1', '1');
+INSERT INTO `rcsite_config` (`config_key`, `value`, `description`, `site_area`, `active`, `hot_configurable`) VALUES ('rightTopCategroy.NZ', 'wp.105', 'communty event - new zeland', 'web', '1', '1');
+INSERT INTO `rcsite_config` (`config_key`, `value`, `description`, `site_area`, `active`, `hot_configurable`) VALUES ('rightTopCategroy.UK', 'wp.51', 'communty events -uk', 'web', '1', '1');
+INSERT INTO `rcsite_config` (`config_key`, `value`, `description`, `site_area`, `active`, `hot_configurable`) VALUES ('rightTopCategroy.USA', 'wp.49', 'communty event -usa', 'web', '1', '1');

@@ -1,0 +1,60 @@
+{
+  "meta": {
+    "name": "VivaLanka URL contract",
+    "version": 2,
+    "captured": "2026-10-10",
+    "source": "live site (www.vivalanka.com) + rcsiteweb code + /sitemapindex.xml",
+    "rule": "Every URL here must keep resolving at the SAME path with the SAME status. A 200 must never become a 301 (D-003).",
+    "notes": [
+      "The default curl User-Agent is blocked with 403 by the edge WAF; send a browser User-Agent.",
+      "Aliases may be empty or all dashes, e.g. /newspage/12247832ai- . The parser must not assume a non-empty alias.",
+      "Live canonical is emitted on the article page and matches /newspage/{id}ai-{alias}.",
+      "Live production sitemap is /sitemapindex.xml (204 shards, ~2M urls)."
+    ]
+  },
+  "sample": {
+    "articleId": 12272011,
+    "dcode": "hosted",
+    "alias": "court-rejects-shiranthi-s-bail-application",
+    "url": "https://www.vivalanka.com/newspage/12272011ai-court-rejects-shiranthi-s-bail-application",
+    "title": "Court Rejects Shiranthi's Bail Application",
+    "canonical": "https://www.vivalanka.com/newspage/12272011ai-court-rejects-shiranthi-s-bail-application",
+    "ogImage": "https://www.vivalanka.com/custom/media3/2026/10/6d9872b9-213f-4373-b50e-acfe66789d77.png",
+    "hasJsonLd": false
+  },
+  "urls": [
+    { "id": "sample-article",        "url": "/newspage/12272011ai-court-rejects-shiranthi-s-bail-application", "serve": "article",          "expect": "200", "critical": true },
+    { "id": "article-empty-alias",   "url": "/newspage/12247832ai-",                                              "serve": "article",          "expect": "200", "critical": true },
+    { "id": "article-dash-alias",    "url": "/newspage/12247828ai-----------------------",                         "serve": "article",          "expect": "200", "critical": true },
+    { "id": "article-video-alias",   "url": "/newspage/12247838ai-",                                              "serve": "article",          "expect": "200", "critical": true },
+    { "id": "legacy-article-query",  "url": "/news/page.jsp?articleid=12272011",                                 "serve": "article",          "expect": "200", "critical": true },
+    { "id": "legacy-short",          "url": "/n/p?i=12272011",                                                    "serve": "article",          "expect": "200", "critical": false },
+    { "id": "mobile-root",           "url": "/mobile/",                                                            "serve": "mobile-home",      "expect": "200", "critical": false },
+    { "id": "mobile-article",        "url": "/mobile/12272011ci-court-rejects-shiranthi-s-bail-application",       "serve": "mobile-article",   "expect": "200", "critical": false },
+    { "id": "home",                  "url": "/",                                                                   "serve": "home",             "expect": "200", "critical": true },
+    { "id": "home-paged",            "url": "/?offset=30",                                                         "serve": "home",             "expect": "200", "critical": true },
+    { "id": "login",                 "url": "/user/login.jsp",                                                     "serve": "login",            "expect": "200", "critical": true },
+    { "id": "password-recovery",     "url": "/user/passwordrecovery.jsp?dcode=preferred&store=usa",                "serve": "user",             "expect": "200", "critical": false },
+    { "id": "change-location",       "url": "/user/changelocation.jsp",                                            "serve": "user",             "expect": "200", "critical": false },
+    { "id": "contact-us",            "url": "/news/contactus.jsp?articleid=2036",                                  "serve": "page",             "expect": "200", "critical": false },
+    { "id": "suggest-url",           "url": "/directory/suggesturl.jsp",                                            "serve": "directory",        "expect": "200", "critical": false },
+    { "id": "robots",                "url": "/robots.txt",                                                         "serve": "robots",           "expect": "200", "critical": true },
+    { "id": "sitemap-index",         "url": "/sitemapindex.xml",                                                   "serve": "sitemap-index",    "expect": "200", "critical": true },
+    { "id": "sitemap-shard",         "url": "/sitemap_1.xml",                                                      "serve": "sitemap-shard",    "expect": "200", "critical": false },
+    { "id": "legacy-html-sitemap",   "url": "/news/sitemap.jsp",                                                   "serve": "html-sitemap",     "expect": "200", "critical": false },
+    { "id": "search-category",       "url": "/rcsearch/news?q=weather",                                            "serve": "search",           "expect": 403, "expectBot": 200, "critical": false, "note": "search is bot-only: browser UA gets 403 (WAF), Googlebot gets 200; also Disallow-ed in robots.txt" }
+  ],
+  "sitemaps": {
+    "index": "/sitemapindex.xml",
+    "shards": 204,
+    "shardPattern": "/sitemap_{n}.xml",
+    "extraIndexes": ["/sitemapindex04302022.xml"],
+    "approxUrls": 2000000
+  },
+  "robots": {
+    "url": "/robots.txt",
+    "disallow": ["/tag/", "/ga.jsp?", "/slcommunity/wp-admin/", "/rcsearch/", "/cgi-bin/"],
+    "allow": "/",
+    "sitemaps": ["/sitemapindex.xml", "/sitemapindex04302022.xml"]
+  }
+}

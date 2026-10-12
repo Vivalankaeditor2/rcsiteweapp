@@ -1,0 +1,41 @@
+services:
+  mariadb:
+    image: mariadb:10.6
+    container_name: rcsite-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?set MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: vivalanka
+      MARIADB_USER: ${MARIADB_USER:-rcsite}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:?set MARIADB_PASSWORD}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+      - --max_allowed_packet=256M
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+      # dbschema.sql creates the 31 tables; db/001-016 seed the config rows.
+      - ../rcsiteweb/db/dbschema.sql:/docker-entrypoint-initdb.d/00-dbschema.sql:ro
+      - ../rcsiteweb/db:/seed:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_buffer_pool_loaded=0"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  solr:
+    image: solr:9
+    container_name: rcsite-solr
+    restart: unless-stopped
+    ports:
+      - "8983:8983"
+    volumes:
+      - solr-data:/var/solr
+    # The production core/collection name must be confirmed (Phase 0 open item)
+    # before this is pointed at, or re-indexed (D-011).
+
+volumes:
+  mariadb-data:
+  solr-data:

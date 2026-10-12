@@ -1,0 +1,57 @@
+User-agent: *
+Disallow: /tag/
+Disallow: /ga.jsp?
+Disallow: /slcommunity/wp-admin/
+Disallow: /rcsearch/
+Disallow: /cgi-bin/
+Allow: /
+Sitemap: https://www.vivalanka.com/sitemapindex.xml
+Sitemap: https://www.vivalanka.com/sitemapindex04302022.xml
+
+User-agent: Googlebot
+Disallow:
+
+User-agent: Googlebot-Image
+Disallow:
+
+User-agent: Googlebot-News
+Disallow:
+
+User-agent: Bingbot
+Disallow:
+
+User-agent: Slurp
+Disallow:
+
+User-agent: DuckDuckBot
+Disallow:
+
+User-agent: Baiduspider
+Disallow:
+
+User-agent: Yandex
+Disallow:
+
+User-agent: Applebot
+Disallow:
+
+User-agent: facebookexternalhit/1.1
+Disallow:
+
+User-agent: meta-externalagent/1.1
+Disallow:
+
+User-agent: meta-webindexer/1.1
+Disallow:
+
+User-agent: facebookexternalua
+Disallow:
+
+User-agent: meta-externalads/1.1
+Disallow:
+
+User-agent: Twitterbot
+Disallow:
+
+User-agent: Siteliner
+Disallow:

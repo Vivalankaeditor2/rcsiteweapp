@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+    http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd" version="1.0">
+	<persistence-unit name="rcsitewebPU" transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<non-jta-data-source>java:comp/env/jdbc/rcsite</non-jta-data-source> 
+		<class>com.rev_creations.persistence.dao.Articles</class>
+		<class>com.rev_creations.persistence.dao.ArticleCategory</class>
+		<class>com.rev_creations.persistence.dao.GeoLocation</class>
+		<class>com.rev_creations.persistence.dao.LocationArticleCategory</class>
+		<class>com.rev_creations.persistence.dao.RcsiteConfig</class>
+		<!-- looks like hibernate 3.3 does not support second level caching so stick
+		with first level caching for now -->
+		<!-- properties>
+  			<property name = "hibernate.connection.driver_class" value = "com.mysql.jdbc.Driver"/>
+			<property name = "hibernate.connection.url" value = "jdbc:mysql://localhost:3306/raveendr"/>
+			<property name = "hibernate.connection.username" value = "root"/>
+	  	</properties-->
+	</persistence-unit>
+  
+</persistence>

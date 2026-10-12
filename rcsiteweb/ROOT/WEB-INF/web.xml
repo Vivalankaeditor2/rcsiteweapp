@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee   http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" id="WebApp_1655263603265">
+ <!-- Example filter to set character encoding on each request -->
+ <filter>
+  <filter-name>Set Character Encoding</filter-name>
+  <filter-class>com.rev_creations.util.SetCharacterEncodingFilter</filter-class>
+  <init-param>
+   <param-name>encoding</param-name>
+   <param-value>UTF-8</param-value>
+  </init-param>
+ </filter>
+<!-- Example filter mapping to apply the "Set Character Encoding" filter
+     to *all* requests processed by this web application -->
+   <filter-mapping>
+        <filter-name>Set Character Encoding</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+ <!--filter>
+  <filter-name>WatermarkFilter</filter-name>
+  <filter-class>com.rev_creations.util.WatermarkFilter</filter-class>
+ </filter>
+
+   <filter-mapping>
+        <filter-name>WatermarkFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping-->
+
+ <servlet>
+  <description>This is the description of my J2EE component</description>
+  <display-name>This is the display name of my J2EE component</display-name>
+  <servlet-name>ConfigServlet</servlet-name>
+  <servlet-class>com.rev_creations.rcsite.ConfigServlet</servlet-class>
+  <load-on-startup>5</load-on-startup>
+ </servlet>
+ <servlet>
+  <servlet-name>newspage</servlet-name>
+  <jsp-file>/news/page.jsp</jsp-file>
+ </servlet>
+ <servlet>
+  <servlet-name>mobilepage</servlet-name>
+  <jsp-file>/mobile/page.jsp</jsp-file>
+ </servlet>
+<servlet>
+  <servlet-name>mobileindex</servlet-name>
+  <jsp-file>/mobile/index.jsp</jsp-file>
+ </servlet>
+
+ <servlet-mapping>
+  <servlet-name>ConfigServlet</servlet-name>
+  <url-pattern>/configservlet</url-pattern>
+ </servlet-mapping>
+ <servlet-mapping>
+  <servlet-name>newspage</servlet-name>
+  <url-pattern>/n/p</url-pattern>
+ </servlet-mapping>
+ <servlet-mapping>
+  <servlet-name>newspage</servlet-name>
+  <url-pattern>/newspage/*</url-pattern>
+ </servlet-mapping>
+ <servlet-mapping>
+  <servlet-name>mobilepage</servlet-name>
+  <url-pattern>/mobilepage/*</url-pattern>
+ </servlet-mapping>
+<servlet-mapping>
+  <servlet-name>mobileindex</servlet-name>
+  <url-pattern>/mobile/*</url-pattern>
+ </servlet-mapping>
+ <welcome-file-list>
+  <welcome-file>index.html</welcome-file>
+  <welcome-file>index.htm</welcome-file>
+  <welcome-file>index.jsp</welcome-file>
+ </welcome-file-list>
+ <error-page>
+  <exception-type>java.lang.Throwable</exception-type>
+  <location>/errorpages/errorpage.jsp</location>
+ </error-page>
+ <error-page>
+  <error-code>404</error-code>
+  <location>/errorpages/notfounderror.jsp</location>
+ </error-page>
+ <login-config>
+  <auth-method>BASIC</auth-method>
+ </login-config>
+ <resource-ref>
+  <description>MySQL rcsite</description>
+  <res-ref-name>jdbc/rcsite</res-ref-name>
+  <res-type>javax.sql.DataSource</res-type>
+  <res-auth>Container</res-auth>
+ </resource-ref>
+ <locale-encoding-mapping-list>
+  <locale-encoding-mapping>
+   <locale>si</locale>
+   <encoding>UTF-8</encoding>
+  </locale-encoding-mapping>
+  <locale-encoding-mapping>
+   <locale>en</locale>
+   <encoding>UTF-8</encoding>
+  </locale-encoding-mapping>
+ </locale-encoding-mapping-list>
+</web-app>

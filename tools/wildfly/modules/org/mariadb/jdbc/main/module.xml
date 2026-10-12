@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  WildFly 27 module for the MariaDB JDBC driver (D-017).
+  Place the driver jar next to this file as: mariadb-java-client-<version>.jar
+  Version used by the backend must equal the version in backend/pom.xml.
+-->
+<module xmlns="urn:jboss:module:1.9" name="org.mariadb.jdbc">
+  <resources>
+    <resource-root path="mariadb-java-client-3.3.3.jar"/>
+  </resources>
+  <dependencies>
+    <module name="java.sql"/>
+  </dependencies>
+</module>

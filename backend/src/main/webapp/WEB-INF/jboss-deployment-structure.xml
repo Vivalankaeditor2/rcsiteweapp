@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Spring Boot 3 on WildFly 27 (D-017).
+  WildFly already provides SLF4J/Logback-compatible logging and the Jakarta EE
+  APIs. Exclude the container's logging modules so Logback and Spring Boot's
+  logging bind correctly instead of colliding with jboss-logmanager.
+  If the first deploy complains about a jakarta.* module, add that module here.
+-->
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
+  <deployment>
+    <exclusions>
+      <module name="org.slf4j"/>
+      <module name="org.slf4j.impl"/>
+      <module name="org.apache.logging.log4j.api"/>
+      <module name="org.apache.logging.log4j.core"/>
+      <module name="org.jboss.logging"/>
+      <module name="org.jboss.logmanager"/>
+      <module name="org.jboss.logmanager.log4j2"/>
+    </exclusions>
+  </deployment>
+</jboss-deployment-structure>

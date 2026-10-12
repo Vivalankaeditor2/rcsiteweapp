@@ -1,0 +1,2 @@
+INSERT INTO `rcsite_config` (`config_key`, `value`, `description`, `site_area`, `active`, `hot_configurable`) VALUES ('rightBotomCategroy.index', '105', 'right bottom section of index pages', 'web', '1', '1');
+INSERT INTO `rcsite_config` (`config_key`, `value`, `description`, `site_area`, `active`, `hot_configurable`) VALUES ('rightBotomCategroy.worldnews', '104', 'right bottom section of worldnews', 'web', '1', '1');

@@ -1,0 +1,6 @@
+INSERT INTO `rcsite_config` (`config_key`, `value`, `description`, `site_area`, `active`, `hot_configurable`) VALUES ('leftTopCategroy.AUS', 'wp.21', 'community news - AUS', 'web', '1', '1');
+INSERT INTO `rcsite_config` (`config_key`, `value`, `description`, `site_area`, `active`, `hot_configurable`) VALUES ('leftTopCategroy.CA', 'wp.20', 'community news - CA', 'web', '1', '1');
+INSERT INTO `rcsite_config` (`config_key`, `value`, `description`, `site_area`, `active`, `hot_configurable`) VALUES ('leftTopCategroy.default', 'wp.18', 'community newsdefault category', 'web', '1', '1');
+INSERT INTO `rcsite_config` (`config_key`, `value`, `description`, `site_area`, `active`, `hot_configurable`) VALUES ('leftTopCategroy.NZ', 'wp.2846', 'communtiy news-New zeland', 'web', '1', '1');
+INSERT INTO `rcsite_config` (`config_key`, `value`, `description`, `site_area`, `active`, `hot_configurable`) VALUES ('leftTopCategroy.UK', 'wp.22', 'news- UK', 'web', '1', '1');
+INSERT INTO `rcsite_config` (`config_key`, `value`, `description`, `site_area`, `active`, `hot_configurable`) VALUES ('leftTopCategroy.USA', 'wp.19', 'community news catID usa', 'web', '1', '1');

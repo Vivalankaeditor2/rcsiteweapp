@@ -1,0 +1,37 @@
+# WildFly 27 CLI: add the MariaDB datasource used by the backend (D-017).
+# Run with:  jboss-cli.ps1 --file=tools/wildfly/standalone-datasource.cli
+# Set --user/--password for the CLI login; the DB credentials below are CLI
+# variables so no secret is stored in this file (D-005).
+
+set db.user=rcsite
+set db.password=CHANGE_ME_LOCAL_ONLY
+set db.host=127.0.0.1
+set db.port=3306
+set db.name=vivalanka
+
+# MariaDB JDBC driver module (installed by tools/wildfly/README.md step 1).
+/subsystem=datasources/jdbc-driver=mariadb:add(driver-name=mariadb, \
+    driver-module-name=org.mariadb.jdbc, \
+    driver-class-name=org.mariadb.jdbc.Driver, \
+    driver-xa-datasource-class-name=org.mariadb.jdbc.MariaDbDataSource)
+
+/subsystem=datasources/data-source=RcSiteDS:add( \
+    jndi-name=java:/jdbc/rcsite, \
+    driver-name=mariadb, \
+    connection-url="jdbc:mariadb://${db.host}:${db.port}/${db.name}?useUnicode=true&characterEncoding=UTF-8", \
+    user-name="${db.user}", \
+    password="${db.password}", \
+    min-pool-size=5, \
+    max-pool-size=50, \
+    blocking-timeout-wait-millis=5000, \
+    valid-connection-checker-class-name=org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker, \
+    exception-sorter-class-name=org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter, \
+    background-validation=true, \
+    background-validation-millis=10000)
+
+# Publish the datasource on the java: namespace so JNDI lookup is simple.
+# (Spring Boot reads java:/jdbc/rcsite in application.properties.)
+/subsystem=datasources/data-source=RcSiteDS:write-attribute(name=enabled, value=true)
+
+# Apply and persist.
+:reload

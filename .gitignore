@@ -1,0 +1,28 @@
+# Build outputs (never commit)
+backend/target/
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/coverage/
+
+# Secrets / local env (names only in the repo - D-005)
+.env
+.env.*
+!.env.example
+*.local
+
+# credentials/ holds local secrets; its own .gitignore also enforces this.
+credentials/*
+!credentials/.gitignore
+!credentials/README.md
+!credentials/*.example
+
+# IDE / OS noise
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
