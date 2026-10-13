@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node --import tsx --test test/article.test.ts test/search.test.ts"
+    "test": "node --import tsx --test test/article.test.ts test/search.test.ts test/routes.test.ts"
   },
   "dependencies": {
     "clsx": "2.1.1",
