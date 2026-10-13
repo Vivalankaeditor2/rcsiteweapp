@@ -56,7 +56,7 @@ export interface PageDto<T> {
   hasNext: boolean;
 }
 
-const BACKEND_URL = (process.env.BACKEND_URL ?? "http://localhost:8080").replace(/\/$/, "");
+export const BACKEND_URL = (process.env.BACKEND_URL ?? "http://localhost:8080").replace(/\/$/, "");
 
 async function getJson<T>(path: string): Promise<T | null> {
   const response = await fetch(`${BACKEND_URL}${path}`, {

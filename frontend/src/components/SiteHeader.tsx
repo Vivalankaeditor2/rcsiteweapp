@@ -43,7 +43,7 @@ export function SiteHeader() {
           </ul>
         </nav>
 
-        <form action="/rcsearch/news" method="get" role="search" className="ml-auto hidden md:flex">
+        <form action="/search" method="get" role="search" className="ml-auto hidden md:flex">
           <label htmlFor="header-search" className="sr-only">
             Search news
           </label>
