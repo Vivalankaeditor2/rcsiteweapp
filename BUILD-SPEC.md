@@ -12,15 +12,15 @@ Target deliverables for the revamp. Status `specified` = planned, not yet built.
 | # | Deliverable | Duty | Acceptance test | Status |
 |---|---|---|---|---|
 | 1 | `backend/` Spring Boot API (Java 17, WildFly 27) | serve article, category, config and feed data | `GET` article `12272011` returns the legacy fields as JSON | built (smoke test not run - no JVM here) |
-| 2 | `frontend/` Next.js app (hosted on IIS) | render the public site (SEO + UX) | article page renders SSR HTML for the sample | specified |
-| 3 | Article route `/newspage/{id}ai-{alias}` + numeric-`dcode` variant | serve indexed article URLs unchanged | byte-identical canonical; 200 (not 301) | specified |
-| 4 | Legacy routes `/news/page.jsp`, `/n/p`, `/mobile/*`, `/mobilepage/*` | keep old URLs alive | each returns 200 with correct content | specified |
+| 2 | `frontend/` Next.js app (hosted on IIS) | render the public site (SEO + UX) | home lists published articles; article page renders SSR HTML for the sample | as-built-verified (Phase 3 shell: home listing + article page render 200 from the API; legacy head preserved) |
+| 3 | Article route `/newspage/{id}ai-{alias}` + numeric-`dcode` variant | serve indexed article URLs unchanged | byte-identical canonical; 200 (not 301) | as-built-verified (200, canonical byte-identical; empty/dash alias shapes OK) |
+| 4 | Legacy routes `/news/page.jsp`, `/n/p`, `/mobile/*`, `/mobilepage/*` | keep old URLs alive | each returns 200 with correct content | as-built-verified (all 200; bad ids 404) |
 | 5 | Search `/rcsearch/news` (Solr) | Solr-backed search + category filter | known query matches legacy top results | specified |
-| 6 | `/sitemapindex.xml` + `robots.txt` + sharded `/sitemap_{n}.xml` | SEO discovery | `robots.txt` points at `/sitemapindex.xml`; index lists shards; sample URL listed (D-020, D-025) | robots.txt built; sitemaps are generated in Phase 2 |
+| 6 | `/sitemapindex.xml` + `robots.txt` + sharded `/sitemap_{n}.xml` | SEO discovery | `robots.txt` points at `/sitemapindex.xml`; index lists shards; sample URL listed (D-020, D-025) | as-built-verified (index lists shards; sample URL listed; robots.txt byte-identical to production) |
 | 7 | Feed/RSS endpoints | syndication parity | feed validates; same items as legacy | specified |
 | 8 | Admin app (React) + JWT auth against `rc_customer` | manage articles/categories/feeds/config | createâ†’publish round-trips to its URL (D-022) | specified |
 | 9 | Feed ingestion jobs (no AI â€” D-010) | poll feeds into `feed_article`; log to `feed_channel_log` | a poll writes a log row and updates `next_poll` | specified |
-| 10 | Backend unit + integration tests | prove the API and repositories | `mvn test` green; article lookup covered | as-built-verified (9 tests green) |
+| 10 | Backend unit + integration tests | prove the API and repositories | `mvn test` green; article lookup covered | as-built-verified (20 tests green, incl. sitemap service/controller) |
 | 11 | Frontend E2E + a11y tests (Playwright/axe) | prove the UI and accessibility | E2E green on the sample; axe clean | specified |
 | 12 | URL-contract regression suite (`tools/url-contract.ps1` + `tools/url-inventory/url-contract.json`) | prove no indexed URL broke | suite green against the live baseline | as-built-verified |
 | 13 | Forbidden-table guard (D-019) | stop the news app touching ``article_category_has_articles`` | ``ForbiddenTableUsageTest`` + ``tools/check-forbidden-tables.ps1`` | as-built-verified |
@@ -28,6 +28,8 @@ Target deliverables for the revamp. Status `specified` = planned, not yet built.
 | 15 | `backend/` JPA entities + repositories (19 in-scope tables, MyISAM-safe) | map the frozen schema; parameterised reads | `mvn test` green; guard test green | as-built-verified (validated against real schema) |
 | 16 | `backend/` read APIs + DTOs/MapStruct + unified errors + OpenAPI | serve article/category/config/feed reads | `GET /api/articles/12272011` returns the article JSON | as-built-verified (200 + 404 tested on WildFly 27) |
 | 17 | `backend/` `logback-spring.xml` (SLF4J + Logback) | replace the legacy log4j 1.2 (NC-002) | logging config loads; no log4j on the classpath | as-built-verified (logs clean on WildFly) |
+| 18 | Paged article listing `GET /api/articles?page&size&categoryId` (+ `PageDto`) | feed listings/feeds from `articles` | page envelope; invalid `page`/`size` -> 400; newest-first | as-built-verified (200 via frontend; service + controller tests green) |
+| 19 | Frontend Phase 3 shell: header/footer, brand tokens, home listing, restyled article | a branded, responsive, SEO-preserving UI | home + article 200; legacy head byte-identical; a11y signals present | as-built-verified (routes + head asserted on the local stack) |
 
 ## Decisions that shape the build
 

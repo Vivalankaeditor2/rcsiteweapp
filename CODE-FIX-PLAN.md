@@ -23,12 +23,15 @@ happen next, this file wins.
 | 9 | Backend: entities for `articles` + the in-scope tables (MyISAM-safe) | built | D-008/D-015; 19 entities, plain ids, no relations |
 | 10 | Backend: `logback-spring.xml` (replace log4j 1.2) | built | NC-002; D-006 |
 | 11 | Verify `rc_customer.pword` format before designing auth | done (Phase 0) | NC-006 - confirmed plaintext; fix needs owner sign-off |
-| 12 | Sitemap generator endpoints (`/sitemapindex.xml`, `/sitemapindex04302022.xml`, `/sitemap_{n}.xml`) | todo | D-020, D-025; Phase 2 |
-| 13 | Frontend: Next.js + Tailwind + shadcn/ui scaffold | todo | TASK-PLAN Phase 3 |
+| 12 | Sitemap generator endpoints (`/sitemapindex.xml`, `/sitemapindex04302022.xml`, `/sitemap_{n}.xml`) | done | D-020, D-025; Phase 2 (SSR-verified end-to-end) |
+| 13 | Frontend: Next.js + Tailwind + brand design tokens scaffold | done | TASK-PLAN Phase 3; shadcn/ui deferred until a page needs a real component |
 | 14 | Backend: repositories + DTOs + MapStruct mappers (entities never exposed) | built | derived queries only (NC-005) |
 | 15 | Backend: read APIs (article by id/dcode, categories, feeds, config) | built | TASK-PLAN Phase 1 |
 | 16 | Backend: unified error body + Caffeine config cache + springdoc OpenAPI | built | TASK-PLAN Phase 1 |
 | 17 | Deploy WAR to WildFly 27 + run the Phase 1 data smoke test | done | deployed to WildFly 27; `GET /api/articles/12272011` + by-dcode + feeds + config all HTTP 200 via JNDI `java:/jdbc/rcsite` |
+| 18 | Backend: paged article listing `GET /api/articles?page&size&categoryId` | done | `/api/` contract (D-026); `PageDto`; bad `page`/`size` (page<0, size outside 1-100) -> 400; service+controller tests green |
+| 19 | Frontend: responsive header/footer shell + home listing + restyled article page | done | TASK-PLAN Phase 3; Tailwind tokens; `ArticleView` shared by desktop + mobile routes |
+| 20 | Remove the Phase 3 demo article `12272011` (and its NULLed image/thumbnail) before handover | open | read-only legacy schema (D-004/D-008); it was re-seeded for the Phase 3 demo only |
 
 ## Locked technical decisions
 
@@ -57,3 +60,4 @@ happen next, this file wins.
 - Media base path `/custom/images/` â€” D-021
 - Auth uses the existing `rc_customer` table â€” D-022
 - Keep the committed connection-file credentials as-is â€” D-023
+- API contract stays at `/api/` (no `/api/v1/`) — D-026

@@ -26,3 +26,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# local preview screenshots
+.preview/

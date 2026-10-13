@@ -1,4 +1,4 @@
-﻿# PROGRESS.md
+# PROGRESS.md
 
 **Duty:** the journal - the single source of truth for what was done (append-only).
 
@@ -210,3 +210,53 @@
   ``/api/feeds`` -> 200 (3 rows); ``/api/config/categoryinterval.100`` -> 200.
   (``/api/categories`` returns ``[]`` only because the seed files contain no category rows.)
   The temporary test article was deleted afterwards. Phase 1 is now fully as-built-verified.
+### [M4] 2026-10-12 - Phase 2 complete: SEO endpoints + URL parity (SSR verified end-to-end)
+- **Gate:** M2 Implementation / M3 Verification
+- **Area:** frontend / backend / SEO
+- **Status:** verified - Phase 2 complete on the local stack (embedded Tomcat + next start).
+- **Views:** TASK-PLAN.md, BUILD-SPEC.md, PROGRESS.md, AGENTS.md, URL-INVENTORY.md, frontend/public/README.md
+- **Detail:** Built and end-to-end verified the Phase 2 SEO-critical endpoints against a
+  temporary sample article (id 12272011, hosted, approval 1), then deleted the row
+  (articles back to 0 rows; legacy schema untouched - read-only, D-004/D-008).
+  (a) Backend: SitemapService/SitemapController generate /sitemapindex.xml (+ the
+  secondary /sitemapindex04302022.xml) and /sitemap_{n}.xml shards from articles,
+  newest first, published-only (aproval_status <> '4' or NULL), base URL from
+  rcsite.sitemap.base-url (default https://www.vivalanka.com). An out-of-range shard
+  returns 404 via the unified error handler. mvn test -> 20/20 green.
+  (b) Frontend: Next.js 14.2.35 app; next build green; node --test -> 13/13 green
+  (article id parsing ^\d{1,9}$, ai-/ci- splitting incl. empty and all-dash aliases,
+  shortenString(desc,150), _short body, hosted internal link, approval-4 not published,
+  canonical, head tags).
+  (c) End-to-end (next start -> rewrites -> Spring Boot): /newspage/12272011ai-{alias}
+  -> 200 with a BYTE-IDENTICAL canonical
+  <link rel="canonical" href="https://www.vivalanka.com/newspage/12272011ai-..." />;
+  /newspage/12272011ai- (empty alias, the numeric-dcode variant) -> 200; legacy
+  /news/page.jsp?articleid=, /n/p?i=, /mobile/{id}ci-{alias}, /mobilepage/... -> 200;
+  bad/non-numeric ids and missing articles -> 404 (no soft-200s). Every URL checked
+  with MaximumRedirection 0, so none is a 301 (D-003). /sitemapindex.xml lists
+  /sitemap_1.xml; the shard lists the sample URL and is served through the frontend
+  rewrite; /sitemap_2.xml -> 404. /robots.txt is byte-identical to the production
+  capture (834 B, served from frontend/public/robots.txt).
+  Evidence note: the live legacy og:description/twitter:description use the raw
+  description with tags stripped only (replaceAll("<.*?>","")), NOT shortenString, so no
+  &nbsp; fix is required - our head logic is faithful.
+  (d) Fixed a route collision: duplicate required+optional catch-all dirs under
+  mobile/mobilepage ([...slug] vs [[...slug]]) made next build fail; kept the optional
+  form and removed the required form.
+- **Open:** search /rcsearch/news (Solr) and category listings are Phase 4; E2E/a11y
+  (Playwright/axe) and IIS rewrite parity are Phase 3/5; the temporary sample row is not committed.
+### [M2] 2026-10-12 - Phase 3 frontend shell + paged listing API (verified end-to-end)
+- **Gate:** M2 Deliverable (+ M3 Verification for the listing error path, + M4 for the `/api/` decision)
+- **Area:** frontend / backend / api
+- **Status:** Phase 3 core done and verified on the local stack; shadcn/ui and the Lighthouse run remain open.
+- **Views:** TASK-PLAN.md, CODE-FIX-PLAN.md, BUILD-SPEC.md, DECISIONS.md, AGENTS.md, PROGRESS.md
+- **Detail:** Built the branded Phase 3 shell and a paged listing endpoint, then verified them end-to-end (embedded Tomcat + `next start`).
+  (a) **Backend listing.** `GET /api/articles?page=&size=&categoryId=` returns a `PageDto` envelope (`items,page,size,totalItems,totalPages,hasNext`), newest-first, optional category filter. A bad `page`/`size` (`page` < 0, or `size` outside 1-100) is validated to a **400**; a bad path/query type is also 400. Contract stays under `/api/` - no `/api/v1/` segment (new **D-026**). Files: `ArticleRepository` (derived paging + category query), `PageDto` (new), `ArticleService`, `ArticleController`, `ApiExceptionHandler`, plus `ArticleServiceTest`/`ArticleControllerTest`. `mvn test` -> **26/26 green**.
+  (b) **Frontend design system.** Tailwind 3.4.14 + postcss + autoprefixer; brand tokens from the legacy palette (`#0066cc` accent, `#1e90ff` bright, `#07056a` deep navy) in `tailwind.config.js`; `globals.css`; the legacy logo copied to `frontend/public`. **shadcn/ui deferred** - no page yet needs a real component, so none was added (avoids unused deps).
+  (c) **Shell.** `SiteHeader` (sticky, primary nav, search entry point, accessible mobile toggle), `SiteFooter`, skip-link and `#main`, wired into `layout.tsx`. Footer uses `MAIN_NAV` from `site.ts`.
+  (d) **Home.** `/` lists published articles newest-first (lead + grid + empty state) from the listing API, replacing the Phase 2 feed placeholder.
+  (e) **Article.** A shared `ArticleView` now renders `/newspage`, `/mobile`, `/mobilepage` so they cannot drift; listing helpers `articleHref` (canonical-derived, always internal), `imageSrc` (resolves `./custom/...` and `/custom/...` from the root, external passthrough, brand placeholder fallback) and `formatDate` (wall-clock, no timezone shift).
+  (f) **Fidelity fix.** The layout initially applied a `%s | VivaLanka` title template, which **appended a suffix to the article `<title>`** - the legacy page emits the raw headline. Removed the template (documented in `layout.tsx`); the article `<title>` is byte-faithful again.
+  (g) **Verification.** `npm test` -> **16/16 green**; `npm run build` -> compiled, 7 routes; the sample article 12272011 was re-inserted for the demo (its `image`/`thumbnail` set NULL so the placeholder shows). All routes checked with `MaximumRedirection 0`: `/`, the sample article, `/newspage/12272011ai-`, `/news/page.jsp?articleid=`, `/n/p?i=`, `/mobile/{id}ci-`, `/mobilepage/...`, `/mobile/`, `/robots.txt`, `/sitemapindex.xml`, `/sitemap_1.xml` all **200**; a bad id -> **404**. The canonical is **byte-identical** to production; `<title>` is the raw headline.
+  (h) **Tooling note.** Lighthouse and headless-Edge screenshots could not complete on this host (Edge/DevTools timeouts); the SEO/a11y signals were asserted directly from the served HTML instead (`html lang`, `viewport`, single `h1`, all images alt-tagged, canonical, title). Performance/SEO numbers remain unmeasured - recorded as an open item, not claimed.
+  **Not done:** shadcn/ui adoption; a measurable Lighthouse run; removing the demo article 12272011 before handover.

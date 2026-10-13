@@ -147,19 +147,19 @@ lookup by `dcode` returns the same row; Swagger UI loads; no credentials in sour
 
 ## Phase 2 â€” SEO-critical endpoints & URL parity
 
-- [ ] Server-render `/newspage/{id}ai-{alias}` (and the numeric-`dcode` variant)
+- [x] Server-render `/newspage/{id}ai-{alias}` (and the numeric-`dcode` variant)
       with the exact canonical, `<title>`, meta description and OG/Twitter tags the
       legacy page emits.
-- [ ] Honour the `dcode` rules: numeric wins; `_short` â‡’ stripped-description body;
+- [x] Honour the `dcode` rules: numeric wins; `_short` â‡’ stripped-description body;
       `hosted` â‡’ internal link; `aproval_status='4'` â‡’ not published.
-- [ ] Serve `/news/page.jsp?articleid=`, `/n/p?i={id}`, `/mobile/{id}ci-{alias}`.
-- [ ] Sitemap: serve `/sitemapindex.xml` (+ the secondary
+- [x] Serve `/news/page.jsp?articleid=`, `/n/p?i={id}`, `/mobile/{id}ci-{alias}`.
+- [x] Sitemap: serve `/sitemapindex.xml` (+ the secondary
       `/sitemapindex04302022.xml`) pointing at `/sitemap_{n}.xml` shards â€” the
       **legacy names** (~204 shards, ~10k URLs each, ~2M total; D-025). Generated
       from `articles`, newest first. `robots.txt` mirrors production
       (`frontend/public/robots.txt`). See `URL-INVENTORY.md`.
-- [ ] Image URL bases: `/custom/images/` **and** `/custom/media*` (D-024).
-- [ ] 404/500 pages with correct status codes (no soft-200s).
+- [x] Image URL bases: `/custom/images/` **and** `/custom/media*` (D-024).
+- [x] 404/500 pages with correct status codes (no soft-200s).
 
 **Smoke test (end of Phase 2):** the sample URL returns 200 with a byte-identical
 canonical and equivalent head metadata vs legacy; the numeric-`dcode` form also
@@ -167,9 +167,19 @@ returns 200; sitemap contains the sample; `curl -I` shows 200 (not 301).
 
 ## Phase 3 â€” Frontend foundation (Next.js + React)
 
-- [ ] Next.js App Router app in `frontend/`; design system (Tailwind + shadcn/ui).
-- [ ] Layout, header/footer, theme, responsive shell matching the brand.
-- [ ] Home page + article page wired to the backend; `next/image`; a11y pass.
+- [x] Next.js App Router app in `frontend/`; Tailwind + brand design tokens
+  (`tailwind.config.js`, `postcss.config.js`, `src/app/globals.css`). shadcn/ui
+  deferred until a page needs a real component.
+- [x] Responsive shell matching the brand: sticky `SiteHeader` (nav + search
+  entry point, mobile toggle), `SiteFooter`, skip link, `layout.tsx`.
+- [x] Home `page.tsx`: newest-first article listing (lead + grid, empty state)
+  from the new `/api/articles` paged endpoint (D-026).
+- [x] Article page via shared `ArticleView` (desktop + mobile routes); legacy
+  head (title/description/og/canonical) preserved byte-for-byte (D-003).
+- [x] Listing helpers (`articleHref`, `imageSrc`, `formatDate`) + unit tests.
+- [ ] shadcn/ui component adoption (only when a page needs a real component).
+- [ ] Lighthouse SEO >= 95 / Performance >= 90 on the sample (tooling blocked on
+  this host; SEO signals asserted from the served HTML instead).
 
 **Smoke test (end of Phase 3):** article page renders the sample end-to-end
 (API â†’ SSR HTML); Lighthouse SEO â‰¥ 95 and Performance â‰¥ 90 on the sample;

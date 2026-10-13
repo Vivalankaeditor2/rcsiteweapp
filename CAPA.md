@@ -1,4 +1,4 @@
-﻿# CAPA.md
+# CAPA.md
 
 **Duty:** the nonconformity register - what broke, root cause, corrective, preventive, verified.
 
@@ -139,3 +139,12 @@ preventive â†’ verification.
 - **Preventive action:** the schema stays documented in `DATABASE.md`; there is\n  no migration tool - `dbschema.sql` is the single DDL source, loaded as-is (D-004).
 - **Verified:** 2026-10-10 â€” all 31 `CREATE TABLE` statements catalogued and
   cross-checked against `DATABASE.md`.
+
+## NC-009 -- PowerShell in-place edits corrupted record-file encoding
+- **Status:** closed
+- **Found:** 2026-10-12
+- **What went wrong:** editing `AGENTS.md` with PowerShell string cmdlets rewrote the file with the wrong codepage: every em-dash became mojibake and a UTF-8 BOM appeared (DECISIONS.md also gained a BOM). Then `git checkout -- AGENTS.md`, used to undo that, discarded a whole uncommitted section of AGENTS.md (the local-dev and frontend-verification blocks) because it had never been committed.
+- **Root cause:** (1) round-tripping a non-UTF-8 file through PowerShell Out-File/Set-Content/Add-Content, which re-encode on write; (2) using git checkout to undo a local edit while uncommitted work existed that HEAD did not have.
+- **Corrective action:** restored the deleted AGENTS.md sections from the pre-checkout read; re-applied edits with the str_replace file editor and with [System.IO.File] UTF-8 (no-BOM) byte-level writes; stripped the BOM from DECISIONS.md; removed the mojibake literal from this file; and corrected an overstated claim (page = 0 is valid; the guard is page >= 0 and size 1-100).
+- **Preventive action:** for existing files prefer the str_replace file editor; if a scripted write is unavoidable read and write with an explicit UTF8Encoding($false) and never Out-File/Set-Content/Add-Content on a file that is not already UTF-8. Never git checkout/git restore to undo a local edit while uncommitted work exists - read it first or commit it first.
+- **Verified:** 2026-10-12 -- BOM/mojibake scan of all touched record files is clean; AGENTS.md content restored; tools/check-record-kit.ps1 -> PASS.

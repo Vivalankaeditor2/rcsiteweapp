@@ -1,4 +1,4 @@
-﻿# DECISIONS.md
+# DECISIONS.md
 
 **Duty:** locked choices - what was decided, when, why, and what would reopen it.
 
@@ -279,3 +279,16 @@ references the old one (for example: "supersedes the earlier entry it names").
 - **Options considered:** rotate and move them to config.
 - **Why:** owner's explicit direction ("ignore, no switching credentials").
 - **Revisit if:** the owner decides to rotate.
+
+## D-026 — API contract stays at `/api/` (no `/api/v1/`)
+- **Decided:** 2026-10-12
+- **Decision:** The new backend REST services live under the `/api/` prefix
+  (e.g. `/api/articles`, `/api/categories`, `/api/feeds`, `/api/config/...`).
+  Do **not** introduce an `/api/v1/` version segment.
+- **Options considered:** (a) version the API as `/api/v1/`; (b) keep the
+  unversioned `/api/` contract.
+- **Why:** owner-approved default (Phase 3). The API is consumed only by our own
+  Next.js frontend, deployed in lockstep; a version segment adds no value and a
+  second copy of every route to keep in sync.
+- **Revisit if:** a third-party or independently-versioned client appears, or a
+  breaking change must be served alongside the old shape.
