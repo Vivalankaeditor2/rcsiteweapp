@@ -292,3 +292,57 @@ references the old one (for example: "supersedes the earlier entry it names").
   second copy of every route to keep in sync.
 - **Revisit if:** a third-party or independently-versioned client appears, or a
   breaking change must be served alongside the old shape.
+
+## D-027 - Search proxied to Solr's HTTP JSON API; public `/search` page for humans
+- **Decided:** 2026-10-13
+- **Decision:** The backend proxies Solr over its HTTP/JSON API using Spring's
+  `RestClient` rather than adding the `solrj` client dependency. It calls the
+  legacy request handler (`base-url + /news`) with `wt=json`, the legacy `fl`
+  field list, `fq=categoryid:`/`parent_categoryid:`, and `rows`/`start`
+  pagination; the response is mapped to `SearchResultDto`. Rows default from
+  `categorylimit.search.*` (falling back to a configured default) bounded by
+  `rcsite.solr.max-rows`. A Solr outage **fails open** (empty page,
+  `available=false`) so a search outage cannot take the site down.
+  The legacy `/rcsearch/news` route keeps its **bot-only** gate (browser -> 403,
+  crawler -> 200); the human-facing search lives at `/search`, which the header
+  form targets, so a person never lands on a 403.
+- **Options considered:** (a) add `solrj` and reuse `RCSearchFacade`; (b) proxy
+  the HTTP JSON API with the already-present `RestClient`; (c) expose human
+  search on `/rcsearch/news` and drop the bot gate.
+- **Why:** (b) adds no dependency, keeps the backend a thin read layer, and uses
+  the exact request Solr already serves. (c) would break the frozen contract that
+  bots depend on (D-003); a separate `/search` preserves it.
+- **Revisit if:** Solr's JSON response for `/news` is customised enough that a
+  schema-aware client (solrj + a response parser) is needed, or auth/TLS to Solr
+  requires a managed client.
+
+## D-028 - Category landing pages use the frozen JSP paths, keyed on the section category
+- **Decided:** 2026-10-13
+- **Decision:** Each legacy section page is preserved at its exact path as a
+  Next.js route (`/news/worldnews.jsp`, `/news/index.jsp`, `/news/Sinhala.jsp`,
+  `/news/pagelist.jsp`), not as a redirect (a 200 must never become a 301; D-003).
+  The section -> category id mapping is taken from the section JSPs
+  (`index`/`worldnews`/`pagelist` -> 7 and 10; `Sinhala` -> 44; the world feed
+  also uses the legacy `(2,3,5,6)` Solr filter). The listing content comes from
+  the `articles` table via `GET /api/articles?categoryId=`, newest first,
+  published-only, with the legacy `?categoryid=` override still honoured.
+- **Options considered:** (a) serve categories from Solr only; (b) serve the
+  listing from `articles` via the existing listing API.
+- **Why:** (b) reuses the tested listing path, keeps postings fresh without
+  waiting on an index, and needs no `article_category_has_articles` read (D-019).
+  Solr remains the search surface; the two compose through `/search`.
+- **Revisit if:** a section must page deeply enough that a live Solr scroll is a
+  better source than the DB listing.
+
+## D-029 - Community/events/charities/sports landings are data-gated
+- **Decided:** 2026-10-13
+- **Decision:** Do not hard-code category ids for the community, events,
+  charities and sports landings yet. Their ids are not fixed in any section JSP
+  and the local category tables (`article_category`, `rc_category`,
+  `article_category_has_articles`) are **empty**, so the mapping cannot be
+  verified. Add these landings once real category data (or the owner's mapping)
+  is available, reusing the D-028 pattern.
+- **Options considered:** (a) guess ids from `rcsite_config` keys; (b) defer.
+- **Why:** guessing an id would ship a section that silently shows the wrong
+  articles - an SEO defect worse than an absent page.
+- **Revisit if:** category data is loaded, or the owner supplies the mapping.

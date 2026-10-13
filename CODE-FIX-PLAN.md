@@ -61,3 +61,6 @@ happen next, this file wins.
 - Auth uses the existing `rc_customer` table â€” D-022
 - Keep the committed connection-file credentials as-is â€” D-023
 - API contract stays at `/api/` (no `/api/v1/`) — D-026
+- Search proxied to Solr's HTTP JSON API; public `/search` for humans, bot-only `/rcsearch/news` — D-027
+- Category pages at the frozen JSP paths, keyed on the section category — D-028
+- Community/events/charities/sports landings are data-gated — D-029

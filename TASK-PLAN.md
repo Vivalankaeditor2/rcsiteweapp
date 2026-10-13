@@ -187,10 +187,22 @@ usable at 360 px and 1440 px widths.
 
 ## Phase 4 â€” Search, categories & listings
 
-- [ ] Solr integration (proxy the existing `/news` collection; D-011).
-- [ ] `/rcsearch/news` search + `fq=category:` filter + `layout=plain` + pagination,
-      driven from `rcsite_config` keys (`categorylimit.*`, `categoryinterval.*`).
-- [ ] Category/landing pages (world news, community, events, charities, sports).
+- [x] Solr integration (proxy the existing `/news` collection; D-011).
+      Backend `SearchService`/`SolrProperties` call Solr's HTTP JSON API directly
+      (no `solrj` dependency), exposed as `GET /api/search` and
+      `GET /api/search/category/{id}`. Row count is driven from `rcsite_config`;
+      a Solr outage fails open (empty, `available=false`) instead of erroring (D-027).
+- [x] `/rcsearch/news` search + `fq=category:` filter + pagination
+      (`rows`/`start`) driven from `rcsite_config` keys (`categorylimit.*`,
+      `categoryinterval.*`). The bot-only gate is preserved (browser -> 403,
+      crawler -> 200); humans use `/search` (D-027). `layout=plain` is served by
+      the plain-HTML `/rcsearch/news` response.
+- [x] Category/landing pages: world news (`/news/worldnews.jsp`), news index
+      (`/news/index.jsp`), Sinhala (`/news/Sinhala.jsp`) and
+      `/news/pagelist.jsp?categoryid=` (D-028).
+- [ ] Community, events, charities and sports landings - **data-gated**: their
+      category ids are not fixed in any section JSP and the local category tables
+      are empty, so the sections cannot be verified yet.
 
 **Smoke test (end of Phase 4):** a known query returns the same top results as
 legacy; category listing and pagination match; `layout=plain` renders for iframes.
