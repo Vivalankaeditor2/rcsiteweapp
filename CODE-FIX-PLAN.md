@@ -36,7 +36,7 @@ happen next, this file wins.
 | 22 | Backend + edge: public RSS (`/api/rss`, `/rss`) | done | TASK-PLAN Phase 6; D-033; legacy defaults (category 7, 10 items); link rule shared with the sitemap |
 | 23 | Media: image upload/resize (`ImageHelper`/`Scalr`) | blocked | D-035; needs an owner storage decision **and** Phase 7 auth - an unauthenticated upload is an arbitrary-file-write hole |
 | 24 | Backend: Spring Security + JWT auth foundation (`POST /api/auth/login`, `GET /api/auth/me`, roles from `usertype`) | done | D-036; `rc_customer` reused as-is (no schema change); `LegacyPasswordVerifier` refuses plaintext unless allowed (NC-006); `mvn test` 71/71 green |
-| 25 | Frontend: React admin UI (article/category/feed/config screens; drop commerce) | open | TASK-PLAN Phase 7; wire the JWT (bearer) into `frontend/`; media screens depend on item 23 (D-035) |
+| 25 | Frontend: React admin UI (article/category/feed/config screens; drop commerce) | done | TASK-PLAN Phase 7; JWT (bearer) wired into `frontend/`; `npm test` 26/26, `tsc` 0, `next build` ok; E2E create->edit->hide->publish->public read 200; media screens depend on item 23 (D-035) |
 
 ## Locked technical decisions
 

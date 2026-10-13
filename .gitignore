@@ -26,6 +26,7 @@ Thumbs.db
 
 # Logs
 *.log
+frontend/next-start.err
 
 # local preview screenshots
 .preview/

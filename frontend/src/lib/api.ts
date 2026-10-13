@@ -34,6 +34,9 @@ export interface FeedChannelDto {
   feedType: string | null;
   sourceSite: string | null;
   defaultCategoryId: number | null;
+  nextPoll: string | null;
+  lastPoll: string | null;
+  comment: string | null;
 }
 
 export interface ArticleCategoryDto {

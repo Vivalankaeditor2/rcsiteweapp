@@ -44,9 +44,23 @@ public class ApiExceptionHandler {
     public ResponseEntity<ApiError> handleBadRequest(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
         return build(HttpStatus.BAD_REQUEST, "Invalid value for '" + ex.getName() + "'", request);
     }
+    @ExceptionHandler(com.rev_creations.rcsite.exception.ConflictException.class)
+    public ResponseEntity<ApiError> handleConflict(RuntimeException ex, HttpServletRequest request) {
+        return build(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ApiError> handleConstraintViolation(ConstraintViolationException ex, HttpServletRequest request) {
         return build(HttpStatus.BAD_REQUEST, "Invalid request parameter", request);
+    }
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiError> handleValidation(org.springframework.web.bind.MethodArgumentNotValidException ex, HttpServletRequest request) {
+        List<String> details = ex.getBindingResult().getFieldErrors().stream()
+                .map(e -> e.getField() + ": " + e.getDefaultMessage())
+                .toList();
+        ApiError body = new ApiError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(), "Validation failed",
+                request.getRequestURI(), details);
+        return ResponseEntity.badRequest().body(body);
     }
     /**
      * A rejected login and any other authentication failure answer 401 with the

@@ -273,8 +273,11 @@ continue path.
 - [x] Verify how `rc_customer.pword` is stored and design auth accordingly
       (storage is plaintext; `LegacyPasswordVerifier` refuses it unless
       `rcsite.auth.allow-legacy-plaintext` is enabled; NC-006 rehash still needs owner approval, D-004).
-- [ ] React admin UI: article, category, feed, config, email screens (drop
-      commerce screens).
+- [x] React admin UI: article, category, feed, config, email screens (drop
+      commerce screens). Done: `src/app/admin/**` (articles list/new/edit,
+      categories, feeds, config, email); JWT bearer wired via `src/lib/auth.ts`
+      and `admin-api.ts`; `npm test` 26/26, `tsc` 0, `next build` ok; E2E
+      create -> edit -> hide -> publish -> public read 200 (D-009, D-036).
 
 **Smoke test (end of Phase 7):** admin login works; create → edit → publish an
 article round-trips and appears at its `/newspage/` URL; the published row is read

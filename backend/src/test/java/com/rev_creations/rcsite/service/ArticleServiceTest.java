@@ -1,7 +1,9 @@
 package com.rev_creations.rcsite.service;
 import com.rev_creations.rcsite.dto.ArticleDto;
+import com.rev_creations.rcsite.dto.AdminArticleRequest;
 import com.rev_creations.rcsite.dto.PageDto;
 import com.rev_creations.rcsite.entity.Article;
+import com.rev_creations.rcsite.exception.ConflictException;
 import com.rev_creations.rcsite.exception.ResourceNotFoundException;
 import com.rev_creations.rcsite.mapper.ArticleMapper;
 import com.rev_creations.rcsite.repository.ArticleRepository;
@@ -105,5 +107,75 @@ class ArticleServiceTest {
         assertThat(result.items()).isEmpty();
         assertThat(result.totalItems()).isZero();
         assertThat(result.hasNext()).isFalse();
+    }
+
+    // --- Phase 7 admin write path -------------------------------------------
+
+    private AdminArticleRequest request(String title, boolean publish) {
+        return new AdminArticleRequest(title, "desc", "body", null, null, null, 3,
+                "Author", null, "Editor", "editor@vivalanka.com", null, null, null, publish);
+    }
+
+    @Test
+    void create_should_publish_a_new_article_with_a_slug_alias() {
+        when(repository.findByAliasOrderByArticleIdDesc("a-new-headline")).thenReturn(List.of());
+        when(repository.save(any(Article.class))).thenAnswer(call -> call.getArgument(0));
+
+        ArticleDto dto = service.create(request("A New Headline", true));
+
+        assertThat(dto.title()).isEqualTo("A New Headline");
+        assertThat(dto.alias()).isEqualTo("a-new-headline");
+        assertThat(dto.aprovalStatus()).isEqualTo("1");
+        assertThat(dto.published()).isNotNull();
+    }
+
+    @Test
+    void create_should_store_the_hidden_status_when_not_publishing() {
+        when(repository.findByAliasOrderByArticleIdDesc("draft")).thenReturn(List.of());
+        when(repository.save(any(Article.class))).thenAnswer(call -> call.getArgument(0));
+
+        assertThat(service.create(request("Draft", false)).aprovalStatus()).isEqualTo("4");
+    }
+
+    @Test
+    void create_should_reject_a_title_whose_alias_collides() {
+        Article existing = article(500, "hosted");
+        existing.setAlias("a-new-headline");
+        when(repository.findByAliasOrderByArticleIdDesc("a-new-headline")).thenReturn(List.of(existing));
+
+        assertThatThrownBy(() -> service.create(request("A New Headline", true)))
+                .isInstanceOf(ConflictException.class)
+                .hasMessageContaining("a-new-headline");
+    }
+
+    @Test
+    void update_should_not_treat_the_article_own_alias_as_a_conflict() {
+        Article existing = article(500, "hosted");
+        existing.setAlias("a-new-headline");
+        when(repository.findById(500)).thenReturn(Optional.of(existing));
+        when(repository.findByAliasOrderByArticleIdDesc("a-new-headline")).thenReturn(List.of(existing));
+        when(repository.save(any(Article.class))).thenAnswer(call -> call.getArgument(0));
+
+        ArticleDto dto = service.update(500, request("A New Headline", true));
+
+        assertThat(dto.alias()).isEqualTo("a-new-headline");
+    }
+
+    @Test
+    void update_should_throw_when_the_article_is_missing() {
+        when(repository.findById(404)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.update(404, request("X", true)))
+                .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void set_published_should_flip_the_status_flag() {
+        Article existing = article(500, "hosted");
+        existing.setAprovalStatus("4");
+        when(repository.findById(500)).thenReturn(Optional.of(existing));
+        when(repository.save(any(Article.class))).thenAnswer(call -> call.getArgument(0));
+
+        assertThat(service.setPublished(500, true).aprovalStatus()).isEqualTo("1");
+        assertThat(service.setPublished(500, false).aprovalStatus()).isEqualTo("4");
     }
 }

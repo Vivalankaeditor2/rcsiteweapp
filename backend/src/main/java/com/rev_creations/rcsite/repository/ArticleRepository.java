@@ -52,4 +52,15 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
             + "where (a.aprovalStatus is null or a.aprovalStatus <> '4') "
             + "and (:categoryId is null or a.categoryId = :categoryId)")
     Page<Article> findPublished(@Param("categoryId") Integer categoryId, Pageable pageable);
+
+    /** The newest article already using an alias - the admin write path's uniqueness probe. */
+    java.util.List<Article> findByAliasOrderByArticleIdDesc(String alias);
+
+    /**
+     * A page of <em>every</em> article (published or hidden) for the admin
+     * listing. Unlike {@link #findPublished}, the "not published" status is not
+     * filtered out - an editor must be able to see and re-publish a hidden row.
+     */
+    @Query("select a from Article a where (:categoryId is null or a.categoryId = :categoryId)")
+    Page<Article> findAllForAdmin(@Param("categoryId") Integer categoryId, Pageable pageable);
 }

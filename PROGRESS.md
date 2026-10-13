@@ -352,3 +352,24 @@
   (d) **Tool + rule (M4).** Added `tools/check-record-encoding.ps1` (raw-byte scan: fails on any `C3 A2`/`C2 A0` pair or UTF-8 BOM) and recorded the rule in AGENTS.md and `SKILLS.md` SOP-005. This defect class (NC-009/NC-011/NC-012) had fired three times, so the process is now written down and automated.
 - **Open:** none for the repair. The repaired files are part of the pending commit set.
 
+### [M2] 2026-10-13 - Phase 7 complete: React admin panel + article write API (verified)
+
+- **Gate:** M2 Deliverable
+- **Area:** frontend / api / admin
+- **Status:** done
+- **Views:** BUILD-SPEC.md, CODE-FIX-PLAN.md, TASK-PLAN.md, CAPA.md, PROGRESS.md
+- **Detail:** Closed the last open Phase 7 item (CODE-FIX-PLAN #25) - the React admin UI - plus the supporting admin/write API, verified end-to-end on the local stack.
+  (a) **Frontend admin panel.** `src/lib/admin-api.ts`, `admin-links.ts`; `src/components/admin/{ui,AdminShell,ArticleForm}.tsx`; routes `src/app/admin/(panel)/{layout,page}.tsx`, `articles/{page,new/page,[id]/page}.tsx`, `categories/`, `feeds/`, `config/`, `email/`. The bearer token from `POST /api/auth/login` is kept in `localStorage` (`src/lib/auth.ts`; D-036). Commerce screens are dropped (D-009).
+  (b) **Backend admin/write API.** `AdminArticleController` (list/create/update/publish), `AdminArticleCategoryController`, `AdminConfigController`, `AdminEmailController`, with `EmailService` + `EmailMessageMapper` + DTOs; `ArticleAlias` derives the legacy alias; `ConflictException`. Writes touch existing `articles` rows only (D-004 in scope); no schema change (D-008).
+  (c) **Tests.** Backend `mvn test` -> **81/81** (was 71; +`AdminArticleWriteApiTest`). Frontend `npm test` -> **26/26** (route guard + admin tests); `tsc --noEmit` exit 0; `next build` succeeds with the admin routes.
+  (d) **E2E (local stack).** demo (ADMIN) login -> create -> edit -> hide -> publish -> public article read 200; the alias is auto-derived; every admin screen returns 200; an unauthenticated `/api/admin/*` request is 401. Visual capture of all eight admin screens via `frontend/scripts/capture-admin-screenshots.mjs` -> `screenshots/01-login.png` ... `08-email.png` (dependency-free CDP over the system Edge).
+- **Open:** media upload screens stay blocked on D-035 (owner storage decision). Phase 8 (cutover) is environment-gated on the owner's IIS/WildFly host.
+
+### [M5] 2026-10-13 - Phase 7 committed and pushed
+
+- **Gate:** M5 Commit
+- **Area:** vcs
+- **Status:** done
+- **Views:** PROGRESS.md, CODE-FIX-PLAN.md, BUILD-SPEC.md, TASK-PLAN.md, CAPA.md
+- **Detail:** Committed the Phase 7 admin panel (backend admin/write API + React UI), the admin-screenshot capture script and the eight `screenshots/`, this record update, `zenodo/RECORD-KIT-CONFORMANCE.md`, and a `.gitignore` entry for the local `frontend/next-start.err` runtime log. Pushed to `origin/main`.
+

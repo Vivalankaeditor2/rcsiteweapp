@@ -39,3 +39,21 @@ test("the dynamic article and mobile routes exist", () => {
     assert.ok(existsSync(resolve(process.cwd(), "src/app", file)), `missing ${file}`);
   }
 });
+
+test("the admin panel routes exist (Phase 7)", () => {
+  const adminRoutes = [
+    "admin/login/page.tsx",
+    "admin/(panel)/page.tsx",
+    "admin/(panel)/articles/page.tsx",
+    "admin/(panel)/articles/new/page.tsx",
+    "admin/(panel)/articles/[id]/page.tsx",
+    "admin/(panel)/categories/page.tsx",
+    "admin/(panel)/feeds/page.tsx",
+    "admin/(panel)/config/page.tsx",
+    "admin/(panel)/email/page.tsx",
+  ];
+  const missing = adminRoutes.filter(
+    (file) => !existsSync(resolve(process.cwd(), "src/app", file)),
+  );
+  assert.deepEqual(missing, [], `admin routes missing: ${missing.join(", ")}`);
+});
