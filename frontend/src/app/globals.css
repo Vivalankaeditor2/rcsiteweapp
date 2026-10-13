@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  @apply bg-canvas text-ink antialiased;
+}
+
+a {
+  @apply text-brand hover:text-brand-dark;
+}
+
+/* Headlines and long-form copy read better with a serif face, as on the legacy
+   site; UI chrome stays sans. */
+.headline {
+  @apply font-serif font-bold tracking-tight text-ink;
+}
+
+.article-body {
+  @apply text-[1.0625rem] leading-8 text-ink-soft;
+}
+.article-body p {
+  @apply my-4;
+}
+.article-body h2 {
+  @apply mt-8 mb-3 font-serif text-2xl font-bold text-ink;
+}
+.article-body h3 {
+  @apply mt-6 mb-2 font-serif text-xl font-bold text-ink;
+}
+.article-body a {
+  @apply underline decoration-brand/40 underline-offset-2;
+}
+.article-body ul {
+  @apply my-4 list-disc pl-6;
+}
+.article-body ol {
+  @apply my-4 list-decimal pl-6;
+}
+.article-body blockquote {
+  @apply my-6 border-l-4 border-brand/40 pl-4 italic text-ink-mute;
+}
+.article-body img {
+  @apply my-6 h-auto max-w-full rounded;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
