@@ -261,13 +261,13 @@
   (h) **Tooling note.** Lighthouse and headless-Edge screenshots could not complete on this host (Edge/DevTools timeouts); the SEO/a11y signals were asserted directly from the served HTML instead (`html lang`, `viewport`, single `h1`, all images alt-tagged, canonical, title). Performance/SEO numbers remain unmeasured - recorded as an open item, not claimed.
   **Not done:** shadcn/ui adoption; a measurable Lighthouse run; removing the demo article 12272011 before handover.
 
-### [M6] 2026-10-12 - Delivery attempt: 3 commits made, push blocked on token scope
-- **Gate:** M6 Delivery (blocked before the push completed)
+### [M6] 2026-10-12 - Delivery: 4 commits pushed to origin/main (initial push)
+- **Gate:** M6 Delivery (complete)
 - **Area:** vcs / delivery
-- **Status:** Local commits DONE; remote push BLOCKED - the GitHub credential lacks Contents:write.
+- **Status:** DONE - local commits made and pushed; remote `main` = `c7b76ed` (5 commits).
 - **Views:** PROGRESS.md, CAPA.md, AGENTS.md, CODE-FIX-PLAN.md
 - **Detail:** Committed the outstanding Phase 2 + Phase 3 + record work as three logical commits on main (backend sitemap/listing; frontend shell; records + tools) on top of the existing Phase 1 commit, then tried to push to https://github.com/Vivalankaeditor2/rcsiteweapp.
   (a) **Secrets scan before staging.** The 35 pending changes were scanned for hardcoded credentials; only masked placeholders were found (DB_PASSWORD=<value> in AGENTS.md, ${DB_PASSWORD:} in application.properties). No secret was staged or committed.
-  (b) **Push blocked.** GITHUB_TOKEN is not exported to the shell; the Windows credential store holds a Vivalankaeditor2 credential that returns 403, and the engine-masked credential could not be located by key name. The fine-grained PAT in C:\allcredentials\Credentials.md authenticates as Vivalankaeditor2 (repo admin/push=true) but its write is denied: POST /git/blobs -> 403 "Resource not accessible by personal access token". The PAT is therefore missing the fine-grained Contents: Read and write (repo) permission.
+  (b) **Push (first attempt blocked, then succeeded).** The first push returned HTTP 403: the fine-grained PAT authenticated as Vivalankaeditor2 (repo admin/push=true) but every write was refused (POST /git/blobs -> 403 "Resource not accessible by personal access token"), i.e. the token lacked the fine-grained Contents: Read and write (repo) permission; GITHUB_TOKEN was not exported and the Windows credential-store entries also 403'd. Recorded as NC-010, the credential was given write access, and a retried push created origin/main (`c7b76ed`, 5 commits); confirmed via `git ls-remote` and the GitHub API.
   (c) **Secret hygiene.** The PAT was used only in-memory for the push attempts; git remote set-url was reset to the plain URL and .git/config was verified token-free. No secret was committed.
-- **Open:** (1) grant Contents: Read and write to the fine-grained PAT (or supply GITHUB_TOKEN), then git push -u origin main; (2) the target repo has no branch yet, so this would be the initial push.
+- **Open:** none for delivery - origin/main exists at `c7b76ed`. (Remaining project items are Phase 4+ and the Phase 3 Lighthouse run.)
