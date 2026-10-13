@@ -157,3 +157,12 @@ preventive â†’ verification.
 - **Corrective action:** committed the pending work locally as three logical commits so nothing was at risk, recorded the blocker (PROGRESS [M6]), and once the credential had write access pushed the branch successfully.
 - **Preventive action:** keep delivery credentials least-privilege, but provision the CI/deploy token with Contents: Read and write on the target repo and verify it with a dry-run push before a delivery session. Never store a PAT in .git/config; use the credential helper or an ephemeral remote URL.
 - **Verified:** 2026-10-12 -- `git push` succeeded; remote `main` = `c7b76ed` (5 commits), confirmed via `git ls-remote` and the GitHub API.
+
+## NC-011 -- PowerShell Set-Content re-corrupted CODE-FIX-PLAN.md (recurrence of NC-009)
+- **Status:** closed
+- **Found:** 2026-10-13
+- **What went wrong:** appending three decision reminders to `CODE-FIX-PLAN.md` with PowerShell `Set-Content -Encoding UTF8` added a UTF-8 BOM (EF BB BF) and double-encoded every em-dash in the file (`E2 80 94` -> `C3 A2 C2 80 C2 94`, i.e. "a-euro-quote"). The file is valid UTF-8, so it still parsed, but the text rendered as mojibake and a BOM appeared - the same defect NC-009 recorded.
+- **Root cause:** the Phase 6 record edit used the exact write path NC-009 already warned against (`Set-Content -Encoding UTF8` on an existing non-UTF-8-on-disk file). The recorded preventive action was not applied. The earlier terminal-mode edits (deleting a duplicate line) were safe only because they touched ASCII-only lines and used `Set-Content` on a file that happened to keep clean ASCII; the em-dash lines corrupted.
+- **Corrective action:** restored the clean file from the last good commit (`git checkout 06bf6de -- CODE-FIX-PLAN.md`) - safe here because no uncommitted work existed - and re-applied all three edits with the `str_replace` file editor. Re-verified: no BOM (first bytes `23 20 43`), em-dashes are proper U+2014, no `C3 A2` mojibake.
+- **Preventive action:** reinforces NC-009 - **never** `Set-Content`/`Out-File`/`Add-Content` on any tracked text file; use the `str_replace` editor for all record edits. If a byte-level write is unavoidable, use `[System.IO.File]::WriteAllText(path, text, New-Object System.Text.UTF8Encoding($false))`. Before committing record files, scan for a BOM and for the `C3 A2` sequence.
+- **Verified:** 2026-10-13 -- `CODE-FIX-PLAN.md` byte scan clean (no BOM, U+2014 present); `tools/check-record-kit.ps1` PASS; all record files re-checked for BOM/mojibake.

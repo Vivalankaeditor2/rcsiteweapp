@@ -17,10 +17,10 @@ Target deliverables for the revamp. Status `specified` = planned, not yet built.
 | 4 | Legacy routes `/news/page.jsp`, `/n/p`, `/mobile/*`, `/mobilepage/*` | keep old URLs alive | each returns 200 with correct content | as-built-verified (all 200; bad ids 404) |
 | 5 | Search `/rcsearch/news` (Solr) | Solr-backed search + category filter | known query matches legacy top results | specified |
 | 6 | `/sitemapindex.xml` + `robots.txt` + sharded `/sitemap_{n}.xml` | SEO discovery | `robots.txt` points at `/sitemapindex.xml`; index lists shards; sample URL listed (D-020, D-025) | as-built-verified (index lists shards; sample URL listed; robots.txt byte-identical to production) |
-| 7 | Feed/RSS endpoints | syndication parity | feed validates; same items as legacy | specified |
+| 7 | Feed/RSS endpoints | syndication parity | feed validates; same items as legacy | as-built-verified (RSS 2.0 at `/api/rss` + public `/rss`; legacy defaults category 7 / 10 items; item link rule shared with the sitemap; `FeedRssServiceTest` + `FeedRssControllerTest` green) |
 | 8 | Admin app (React) + JWT auth against `rc_customer` | manage articles/categories/feeds/config | createâ†’publish round-trips to its URL (D-022) | specified |
-| 9 | Feed ingestion jobs (no AI â€” D-010) | poll feeds into `feed_article`; log to `feed_channel_log` | a poll writes a log row and updates `next_poll` | specified |
-| 10 | Backend unit + integration tests | prove the API and repositories | `mvn test` green; article lookup covered | as-built-verified (20 tests green, incl. sitemap service/controller) |
+| 9 | Feed ingestion jobs (no AI — D-010) | poll feeds into `feed_article`; log to `feed_channel_log` | a poll writes a log row and updates `next_poll` | as-built-verified (`FeedPollServiceTest` drives a real in-process HTTP feed: items staged, log row written, `next_poll` moved forward; `POST /api/feeds/{id}/poll` verified live) |
+| 10 | Backend unit + integration tests | prove the API and repositories | `mvn test` green; article lookup covered | as-built-verified (57 tests green, incl. feed parser/poll/RSS, sitemap and search) |
 | 11 | Frontend E2E + a11y tests (Playwright/axe) | prove the UI and accessibility | E2E green on the sample; axe clean | specified |
 | 12 | URL-contract regression suite (`tools/url-contract.ps1` + `tools/url-inventory/url-contract.json`) | prove no indexed URL broke | suite green against the live baseline | as-built-verified |
 | 13 | Forbidden-table guard (D-019) | stop the news app touching ``article_category_has_articles`` | ``ForbiddenTableUsageTest`` + ``tools/check-forbidden-tables.ps1`` | as-built-verified |

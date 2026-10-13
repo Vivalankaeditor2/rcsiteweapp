@@ -314,3 +314,14 @@
   (g) **Admin surface.** `GET /api/feeds`, `GET /api/feeds/{id}/log` (newest-first, 404 for an unknown channel), `POST /api/feeds/{id}/poll`.
   (h) **Verification.** `mvn test` -> **57/57 green** (was 37; +20 across `FeedParserTest`, `FeedPollServiceTest` - a real in-process HTTP feed - `FeedRssServiceTest`, `FeedRssControllerTest`). Records guards PASS. URL contract unchanged at 17/20 (no regression).
 - **Open:** image upload is blocked on a storage decision + Phase 7 auth (D-035). The 3 bundled channels point at dead YouTube playlist URLs (real legacy data), so a live poll here logs `http 404`; the happy path is proven by the test. Solr is still not installed locally.
+
+### [M3] 2026-10-13 - Phase 6 records: BUILD-SPEC view orphaned, then a record-file encoding defect (NC-011)
+- **Gate:** M3 Defect
+- **Area:** records / records-kit conformance
+- **Status:** done
+- **Views:** BUILD-SPEC.md, CODE-FIX-PLAN.md, CAPA.md, AGENTS.md
+- **Detail:** Two record defects found while closing Phase 6, both fixed.
+  (a) **Orphaned view.** The Phase 6 code moved but `BUILD-SPEC.md` markers 7 (Feed/RSS endpoints) and 9 (Feed ingestion jobs) were left at `specified`, and marker 10's test count still read "20 tests". The Phase 6 commit updated TASK-PLAN/PROGRESS/DECISIONS/CODE-FIX-PLAN/AGENTS/URL-INVENTORY but not BUILD-SPEC - an orphaned view, which the kit's self-check calls a defect. Fixed: markers 7 and 9 -> `as-built-verified` with the evidence, marker 10 -> 57 tests.
+  (b) **Encoding defect (NC-011, a recurrence of NC-009).** Appending the D-033..D-035 reminders to `CODE-FIX-PLAN.md` with PowerShell `Set-Content -Encoding UTF8` added a BOM and double-encoded the em-dashes. Restored the file from `06bf6de` (safe - no uncommitted work) and re-applied the edits with the `str_replace` editor; byte scan now clean. See `CAPA.md` NC-011.
+  (c) **Kit self-check run.** All 10 record files exist; `AGENTS.md` states the project type; every `SOP-NNN`/`NC-NNN`/`D-NNN` pointer resolves; record-kit guard PASS.
+- **Open:** NC-009/NC-011 both stem from PowerShell writes to UTF-8 files; the standing rule (use `str_replace`; never `Set-Content`/`Out-File` on a tracked file) is recorded in CAPA and AGENTS.md.

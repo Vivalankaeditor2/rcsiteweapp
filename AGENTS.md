@@ -33,6 +33,13 @@ and its supporting database, content feeds and admin tools.
   rule here, then point to the exact `SKILLS.md SOP-NNN`.
 - **No dangling pointers.** Never name a `SOP-NNN`, `NC-NNN` or `D-NNN` that
   does not exist.
+- **Never rewrite a text file with PowerShell string cmdlets.** `Set-Content`,
+  `Out-File` and `Add-Content` re-encode on write, which adds a BOM and corrupts
+  non-ASCII characters (this happened twice: `CAPA.md` NC-009, NC-011). Edit files
+  with the `str_replace` editor. If a byte-level write is unavoidable, use
+  `[System.IO.File]::WriteAllText($path, $text, (New-Object System.Text.UTF8Encoding($false)))`.
+  Before committing record files, scan them for a BOM and for the `C3 A2` byte
+  sequence.
 
 ## Hard rules for this project
 
