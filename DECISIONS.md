@@ -392,3 +392,46 @@ references the old one (for example: "supersedes the earlier entry it names").
   with no server, whatever the environment.
 - **Revisit if:** the contract harness becomes part of CI (then this is a
   redundant first line).
+
+## D-033 - RSS is served at /api/rss and publicly at the additive /rss
+- **Decided:** 2026-10-13
+- **Decision:** The feed is rendered by the backend at `/api/rss` and exposed to
+  the public at `/rss` (IIS rewrite + a Next.js dev rewrite). Output is RSS 2.0,
+  defaults match the legacy `FeedGenerator` (category 7, 10 items), and item
+  links use the frozen article URL (D-003). `/rss` is **new**: the legacy feed
+  servlet had no stable public path, so this adds a URL without changing any
+  existing one. The legacy `<link>` values (`news/page.jsp?articleid=`) are kept.
+- **Options considered:** (a) no public URL, backend-only; (b) `/rss`; (c) a
+  legacy-shaped path such as `/feed.xml`.
+- **Why:** (b) is the conventional discovery path and is unambiguously additive;
+  a new path cannot collide with the frozen contract or turn a 200 into a 301.
+- **Revisit if:** the owner wants a specific feed path or a channel-per-category
+  URL scheme (then add those as extra mappings).
+
+## D-034 - Feed polling de-duplicates on guid and is off in tests
+- **Decided:** 2026-10-13
+- **Decision:** The poll sweep (`FeedScheduler`) upserts `feed_article` keyed on
+  the feed's own `guid` (RSS `guid` / Atom `id`); an item without a usable guid is
+  dropped rather than stored, because it cannot be de-duplicated. Each channel is
+  polled in its own transaction and a failure is written to `feed_channel_log`
+  and rescheduled, never thrown. The scheduler is disabled in the test profile
+  (`rcsite.feed.scheduler-enabled=false`) and tests drive `pollChannel` directly.
+- **Options considered:** (a) insert every poll as the legacy job did; (b) upsert
+  on guid.
+- **Why:** (a) duplicates on every sweep; (b) is idempotent, so a re-poll is safe
+  and the table does not grow without bound.
+- **Revisit if:** a source recycles guids for changed content (then add a content
+  hash to the identity).
+
+## D-035 - Image upload is deferred until storage is decided and auth exists
+- **Decided:** 2026-10-13
+- **Decision:** The legacy `ImageHelper`/`Scalr` resize/upload endpoints are **not
+  ported in Phase 6**. Two prerequisites are missing: an owner decision on where
+  uploads live (local disk vs object store vs the legacy `/custom/media*` tree),
+  and Phase 7 authentication. An unauthenticated upload endpoint is an
+  arbitrary-file-write / stored-XSS hole, so it must not ship first.
+- **Options considered:** (a) port the endpoints now with a default storage dir;
+  (b) defer until storage + auth are settled.
+- **Why:** (a) ships a security hole and a storage choice the owner must own.
+- **Revisit if:** storage is chosen **and** Phase 7 auth is in place (then port
+  behind an authenticated admin endpoint).

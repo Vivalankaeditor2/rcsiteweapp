@@ -298,3 +298,19 @@
   (d) **No-301 evidence.** Checked every path with `MaximumRedirection 0`: all contract URLs answer directly (200/404), none 301. Next.js keeps `trailingSlash: false` + `skipTrailingSlashRedirect: true`.
   (e) **Tests.** Added `test/routes.test.ts` (new **D-032**) - it fails the suite if any frozen path loses its route file, so a future rename cannot silently 404 an indexed URL. `npm test` -> **23/23 green** (was 21); `npm run build` -> compiled, 20 routes.
 - **Open:** the 3 remaining contract misses are local-data only (`12247832`, `12247828`, `12247838` - the DB has 1 article); `/directory/suggesturl.jsp` has **no legacy source** in the tree, so its behaviour is a shell pending owner confirmation; the interactive `/user/*`, contact and suggest forms await Phase 6/7.
+
+### [M9] 2026-10-13 - Phase 6: feeds & RSS (feed-job port); media deferred
+- **Gate:** M2 Deliverable (+ M3 Verification + M4 for the RSS-path and upload decisions)
+- **Area:** backend / feeds / scheduled jobs
+- **Status:** the feed job and RSS are done and verified; image upload is deliberately deferred (D-035).
+- **Views:** TASK-PLAN.md, DECISIONS.md, PROGRESS.md, AGENTS.md, CODE-FIX-PLAN.md
+- **Detail:** Ported the legacy feed machinery, which the backend already had entities/repositories for but no behaviour.
+  (a) **Poll job.** `FeedScheduler` (`@EnableScheduling`, fixed delay, `initial-delay` 30s) sweeps `feed_channel` rows that are active and due (`findDue`), and `FeedPollService` fetches -> parses -> stages into `feed_article` -> writes `feed_channel_log` -> sets `last_poll`/`next_poll`. Each channel is its own transaction; a fetch failure is logged and the channel rescheduled, never thrown - so one dead source cannot stop the sweep.
+  (b) **Parser.** `FeedParser` handles RSS 2.0 (items under `<channel>`) and Atom (entries), matches on element **local name** so prefixes like `content:encoded`/`atom:id` resolve, reads `content:encoded`/`content` into `details`, and normalises dates (RFC 822 including `GMT`/`EST`-style zones, ISO offsets) to **UTC**. XXE is disabled while a benign `DOCTYPE` is still tolerated. Items with no usable guid are dropped (see D-034).
+  (c) **Fetch.** `FeedFetchService` uses the JDK `HttpClient` (no new dependency), a UA, timeouts, and returns failures as a result rather than throwing.
+  (d) **De-dup (D-034).** Upsert keyed on the feed `guid`, so re-polling is idempotent; capped by `max-items-per-poll`. This is a real improvement over the legacy job, which re-inserted.
+  (e) **RSS (D-033).** `FeedRssService` renders RSS 2.0 with the legacy defaults (category 7, 10 items) and the frozen article link, served at `/api/rss` and publicly at `/rss`. Titles are XML-escaped; descriptions go in CDATA with `]]>` splitting.
+  (f) **Shared URL rule.** Extracted `ArticleUrls.canonical(...)`, now used by **both** the sitemap and the RSS feed, so the two cannot drift (D-003).
+  (g) **Admin surface.** `GET /api/feeds`, `GET /api/feeds/{id}/log` (newest-first, 404 for an unknown channel), `POST /api/feeds/{id}/poll`.
+  (h) **Verification.** `mvn test` -> **57/57 green** (was 37; +20 across `FeedParserTest`, `FeedPollServiceTest` - a real in-process HTTP feed - `FeedRssServiceTest`, `FeedRssControllerTest`). Records guards PASS. URL contract unchanged at 17/20 (no regression).
+- **Open:** image upload is blocked on a storage decision + Phase 7 auth (D-035). The 3 bundled channels point at dead YouTube playlist URLs (real legacy data), so a live poll here logs `http 404`; the happy path is proven by the test. Solr is still not installed locally.

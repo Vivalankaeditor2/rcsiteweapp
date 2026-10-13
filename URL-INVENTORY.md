@@ -95,7 +95,9 @@ Host is always `www.vivalanka.com`. Old shards use `http://`; new ones `https://
 | D-024 | Image bases | `/custom/images/` **and** `/custom/media*` |
 | D-025 | Sitemap shard naming | new app **also serves `/sitemap_{n}.xml`** (and keeps `/sitemapindex.xml`), so no crawled URL 404s |
 
-Both need your sign-off before the frontend/sitemap work starts.
+Both are **now recorded** - D-024 and D-025 in `DECISIONS.md` - and implemented
+(the sitemap endpoints serve both index names and `/sitemap_{n}.xml`; see the
+Phase 5 note below).
 
 ## Local re-run (Phase 5, 2026-10-13)
 
@@ -105,3 +107,11 @@ structural URL passes; the 3 misses are the extra sample articles
 local-data limit, not a routing gap. Run against `https://www.vivalanka.com`
 for the 20/20 baseline. Paths are served at the exact requested path with no
 301 (`MaximumRedirection 0` checked), per D-030.
+
+## Phase 6 addition - `/rss` (2026-10-13)
+
+`/rss` is **additive**, not frozen (D-033): the legacy feed servlet had no stable
+public path, so no captured URL changes. The harness (`url-contract.json`) is
+left as the frozen 20-entry contract. The feed is served at `/api/rss` and
+exposed publicly at `/rss` (IIS `web.config` rule 1b + a Next.js dev rewrite).
+Item links use the frozen article URL rule (D-003).

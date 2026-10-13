@@ -236,16 +236,32 @@ structural path passes.
 
 ## Phase 6 â€” Content, feeds & media
 
-- [ ] Port `FeedGenerator` (YouTube/Atom), `GenerateRSS`, `SearchUpdater` as
+- [x] Port `FeedGenerator` (YouTube/Atom), `GenerateRSS`, `SearchUpdater` as
       scheduled jobs writing `feed_article` / `feed_channel_log` and updating
-      `next_poll` on `feed_channel`.
+      `next_poll` on `feed_channel`. Delivered: `FeedScheduler` (fixed-delay
+      sweep, `@EnableScheduling`), `FeedPollService` (fetch -> parse -> stage ->
+      log -> reschedule; per-channel transaction), `FeedParser` (RSS 2.0 + Atom,
+      guid de-dupe, XXE-safe), `FeedFetchService` (JDK HttpClient). RSS is served
+      at `/api/rss` and publicly at `/rss` (D-033). Defaults match the legacy
+      servlet: category 7, 10 items.
 - [ ] Media handling: image resize/upload endpoints (port `ImageHelper`/`Scalr`);
-      storage decision.
-- [ ] **No AI** (D-010) â€” do not port `AIArticleGenerator`.
-- [ ] **No commerce** (D-009) â€” do not port the storefront.
+      storage decision. **Blocked** - needs an owner storage decision (local disk
+      vs object store vs the legacy `/custom/media*` tree) and Phase 7 auth: an
+      unauthenticated upload endpoint is an arbitrary-file-write hole. Do not
+      ship it until both exist (D-035).
+- [x] **No AI** (D-010) - `AIArticleGenerator.java` exists in the legacy tree
+      and is deliberately **not ported**; no AI code path is added.
+- [x] **No commerce** (D-009) - the storefront is not ported (verified absent).
 
 **Smoke test (end of Phase 6):** a feed poll writes a `feed_channel_log` row and
 updates `next_poll`; a raw item lands in `feed_article`; the RSS endpoint validates.
+Result: the happy path is covered end-to-end by `FeedPollServiceTest` (a real
+in-process HTTP feed -> items staged, a log row written, `next_poll` moved
+forward). On the local stack `POST /api/feeds/{id}/poll` logs a row and
+reschedules, and `GET /rss` returns `application/rss+xml` (1 item for the local
+article's category 3). The 3 bundled channels point at dead YouTube playlist URLs
+(real legacy data), so a live poll logs `http 404` - exactly the recorded-and-
+continue path.
 
 ## Phase 7 â€” Admin & authentication
 
