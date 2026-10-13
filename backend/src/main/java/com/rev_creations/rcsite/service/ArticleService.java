@@ -1,9 +1,14 @@
 package com.rev_creations.rcsite.service;
 import com.rev_creations.rcsite.dto.ArticleDto;
+import com.rev_creations.rcsite.dto.PageDto;
 import com.rev_creations.rcsite.entity.Article;
 import com.rev_creations.rcsite.exception.ResourceNotFoundException;
 import com.rev_creations.rcsite.mapper.ArticleMapper;
 import com.rev_creations.rcsite.repository.ArticleRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -42,5 +47,19 @@ public class ArticleService {
             throw new ResourceNotFoundException("No article with dcode " + dcode);
         }
         return articleMapper.toDto(matches.get(0));
+    }
+
+    /**
+     * A page of published articles for a listing, newest first. {@code
+     * categoryId} may be null to list every category. Only published articles
+     * are returned, so a listing never links to a URL that 404s.
+     */
+    @Transactional(readOnly = true)
+    public PageDto<ArticleDto> listPublished(Integer categoryId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "articleId"));
+        Page<Article> result = articleRepository.findPublished(categoryId, pageable);
+        List<ArticleDto> items = result.getContent().stream().map(articleMapper::toDto).toList();
+        return new PageDto<>(items, result.getNumber(), result.getSize(),
+                result.getTotalElements(), result.getTotalPages(), result.hasNext());
     }
 }
