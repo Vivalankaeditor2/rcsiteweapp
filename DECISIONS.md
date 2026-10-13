@@ -346,3 +346,49 @@ references the old one (for example: "supersedes the earlier entry it names").
 - **Why:** guessing an id would ship a section that silently shows the wrong
   articles - an SEO defect worse than an absent page.
 - **Revisit if:** category data is loaded, or the owner supplies the mapping.
+
+## D-030 - IIS preserves the exact path (no rewrite may change a URL or status)
+- **Decided:** 2026-10-13
+- **Decision:** IIS (`frontend/web.config`, URL Rewrite + ARR) only
+  **reverse-proxies**: `/api/*` and the sitemaps to WildFly (127.0.0.1:8080),
+  everything else to Next.js (127.0.0.1:3000) at the **exact requested path**
+  (`{R:1}` passthrough). The rule set deliberately contains **no** trailing-slash,
+  casing, www or canonicalising rule, because any of those turns an indexed 200
+  into a 301 - the top-severity failure in this project (D-003). Next.js keeps
+  `trailingSlash: false` + `skipTrailingSlashRedirect: true` for the same reason.
+- **Options considered:** (a) reverse-proxy only, path untouched; (b) add
+  canonicalising rewrites (trailing slash, lower-case) for tidiness.
+- **Why:** (b) breaks the contract and loses link equity; the URL is the product.
+- **Revisit if:** the site moves to a single upstream, or the edge must terminate
+  and rewrite the host (owner-level, with a redirect-mapping table).
+
+## D-031 - Later-phase pages are served as URL-preserving shells with a visible notice
+- **Decided:** 2026-10-13
+- **Decision:** A frozen URL whose behaviour belongs to a later phase
+  (`/user/login.jsp`, `/user/passwordrecovery.jsp`, `/user/changelocation.jsp`,
+  `/news/contactus.jsp`, `/directory/suggesturl.jsp`) is served **now** at its
+  exact path with the legacy form fields, but the submit is **disabled** and a
+  visible notice says it is not wired yet. No form silently no-ops, and no fake
+  success message is shown. `/news/plainpage.jsp` and `/news/sitemap.jsp` are
+  fully implemented (no later-phase dependency); `/news/plainpage.jsp` shares the
+  article lookup and the published rule.
+- **Options considered:** (a) 404 the not-yet-implemented URLs; (b) serve a shell
+  that looks functional; (c) serve the real layout with a disabled, labelled form.
+- **Why:** (a) breaks the contract (D-003); (b) misleads users and burns trust;
+  (c) keeps the URL alive and is honest about the state.
+- **Revisit if:** the phase that supplies the behaviour lands (then wire the
+  form and drop the notice).
+
+## D-032 - A unit test guards every frozen path in the build
+- **Decided:** 2026-10-13
+- **Decision:** `frontend/test/routes.test.ts` asserts that a route file exists
+  for every frozen path (`src/app/.../page.tsx` or `route.ts`), so `npm test`
+  fails the build if a rename or deletion would 404 an indexed URL. It asserts
+  **presence**, not rendering; the rendered status stays with
+  `tools/url-contract.ps1` (which needs a running stack and cannot run in CI).
+- **Options considered:** (a) rely on the manual contract harness only;
+  (b) add a fast build-time presence check.
+- **Why:** (b) catches the highest-severity regression (D-003) in every build
+  with no server, whatever the environment.
+- **Revisit if:** the contract harness becomes part of CI (then this is a
+  redundant first line).

@@ -209,12 +209,30 @@ legacy; category listing and pagination match; `layout=plain` renders for iframe
 
 ## Phase 5 â€” Legacy URL preservation & mobile
 
-- [ ] IIS URL-rewrite / reverse-proxy rules so every contract URL resolves
-      unchanged; Next.js `rewrites`/`middleware` for the app-owned paths.
-- [ ] Mobile URLs served by the responsive app (no separate mobile codebase).
+- [x] IIS URL-rewrite / reverse-proxy rules so every contract URL resolves
+      unchanged; Next.js `rewrites` for the app-owned paths. Delivered as
+      `frontend/web.config` (URL Rewrite + ARR): `/api/*` and the sitemaps proxy
+      to WildFly, everything else to Next.js at the **exact requested path**.
+      It adds **no** trailing-slash/casing/canonicalising rule, so a 200 never
+      becomes a 301 (D-003, D-030). Next.js `next.config.mjs` keeps the dev-time
+      proxy for `/api/*` and the sitemaps.
+- [x] Mobile URLs served by the responsive app (no separate mobile codebase):
+      `/mobile/` and `/mobile/{id}ci-{alias}` (+ `/mobilepage/*`) render through
+      the shared `ArticleView`.
+- [x] Structural URL gaps closed: `/news/plainpage.jsp`, `/news/contactus.jsp`,
+      `/news/sitemap.jsp`, `/directory/suggesturl.jsp`, `/user/login.jsp`,
+      `/user/passwordrecovery.jsp`, `/user/changelocation.jsp` now resolve at
+      their exact paths. The interactive `/user/*` and contact forms are
+      URL-preserving shells pending Phase 6 (mail) / Phase 7 (auth); they render
+      the legacy fields but submit disabled, with a visible notice rather than a
+      silent no-op (D-030, D-031).
 
 **Smoke test (end of Phase 5):** the full URL-contract regression suite passes
 with **zero** URI changes and no unintended 301s; mobile URLs return 200.
+Local result: **17/20** against `http://localhost:3000`. The only 3 misses are
+the three extra sample articles (`12247832`, `12247828`, `12247838`) that are
+**not in the local DB** - a local-data limit, not a routing gap; every
+structural path passes.
 
 ## Phase 6 â€” Content, feeds & media
 

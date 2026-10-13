@@ -64,3 +64,6 @@ happen next, this file wins.
 - Search proxied to Solr's HTTP JSON API; public `/search` for humans, bot-only `/rcsearch/news` — D-027
 - Category pages at the frozen JSP paths, keyed on the section category — D-028
 - Community/events/charities/sports landings are data-gated — D-029
+- IIS reverse-proxies only; no rewrite may change a URL or status — D-030
+- Later-phase pages are URL-preserving shells with a visible notice — D-031
+- A unit test guards every frozen path in the build — D-032

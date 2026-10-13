@@ -96,3 +96,12 @@ Host is always `www.vivalanka.com`. Old shards use `http://`; new ones `https://
 | D-025 | Sitemap shard naming | new app **also serves `/sitemap_{n}.xml`** (and keeps `/sitemapindex.xml`), so no crawled URL 404s |
 
 Both need your sign-off before the frontend/sitemap work starts.
+
+## Local re-run (Phase 5, 2026-10-13)
+
+`tools/url-contract.ps1 -BaseUrl http://localhost:3000` -> **17/20**. Every
+structural URL passes; the 3 misses are the extra sample articles
+(`12247832`, `12247828`, `12247838`) that are not loaded in the local DB - a
+local-data limit, not a routing gap. Run against `https://www.vivalanka.com`
+for the 20/20 baseline. Paths are served at the exact requested path with no
+301 (`MaximumRedirection 0` checked), per D-030.
