@@ -4,6 +4,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Entry point for the VivaLanka.com revamp API.
@@ -12,9 +13,13 @@ import org.springframework.cache.annotation.EnableCaching;
  * WildFly-managed JNDI datasource (D-017). Extending {@link SpringBootServletInitializer}
  * lets the container bootstrap the application context; the embedded
  * {@code main} is used only for local/dev runs.
+ *
+ * <p>{@code @EnableScheduling} runs the feed poll sweep (the legacy
+ * {@code FeedGenerator} timer); toggle it with {@code rcsite.feed.scheduler-enabled}.
  */
 @SpringBootApplication
 @EnableCaching
+@EnableScheduling
 public class RcSiteApplication extends SpringBootServletInitializer {
     public static void main(String[] args) {
         SpringApplication.run(RcSiteApplication.class, args);

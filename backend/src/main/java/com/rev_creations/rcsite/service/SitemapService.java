@@ -3,6 +3,7 @@ package com.rev_creations.rcsite.service;
 import com.rev_creations.rcsite.config.SitemapProperties;
 import com.rev_creations.rcsite.repository.ArticleRepository;
 import com.rev_creations.rcsite.repository.ArticleUrlProjection;
+import com.rev_creations.rcsite.util.ArticleUrls;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,22 +79,10 @@ public class SitemapService {
     /**
      * The canonical article URL, mirroring {@code news/page.jsp}: a numeric
      * {@code dcode} replaces the id; a null alias falls back to the query form.
+     * Shared with the RSS feed so the two cannot drift (D-003).
      */
     private String canonicalUrl(ArticleUrlProjection article) {
-        String base = properties.getBaseUrl();
-        String dcode = article.getDcode();
-        boolean numericDcode = dcode != null && dcode.matches("\\d+");
-        Integer id = article.getArticleId();
-        if (numericDcode) {
-            return base + "/newspage/" + dcode + "ai-" + nullToEmpty(article.getAlias());
-        }
-        if (article.getAlias() != null) {
-            return base + "/newspage/" + id + "ai-" + article.getAlias();
-        }
-        return base + "/news/page.jsp?articleid=" + id;
-    }
-
-    private static String nullToEmpty(String value) {
-        return value == null ? "" : value;
+        return ArticleUrls.canonical(properties.getBaseUrl(), article.getArticleId(),
+                article.getDcode(), article.getAlias());
     }
 }

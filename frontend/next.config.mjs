@@ -15,6 +15,9 @@ const nextConfig = {
     // WildFly; in dev/Next these rewrites stand in for that proxy.
     return [
       { source: "/api/:path*", destination: `${BACKEND_URL}/api/:path*` },
+      // New additive public RSS path (the legacy feed had no stable public URL);
+      // see D-033. The backend serves it at /api/rss.
+      { source: "/rss", destination: `${BACKEND_URL}/api/rss` },
       { source: "/sitemapindex.xml", destination: `${BACKEND_URL}/sitemapindex.xml` },
       { source: "/sitemapindex04302022.xml", destination: `${BACKEND_URL}/sitemapindex04302022.xml` },
       { source: "/sitemap_:n([0-9]+).xml", destination: `${BACKEND_URL}/sitemap_:n.xml` },
