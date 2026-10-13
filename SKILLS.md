@@ -75,3 +75,27 @@ SOPs for processes we repeat. **One SOP per process.**
 - **Verify:** the final line reads `RECORD-KIT: PASS` and the exit code is `0`.
 - **Failure mode:** a pointer to a `D-NNN`/`NC-NNN`/`SOP-NNN` that was never
   defined — add the entry, or fix the reference.
+
+## SOP-005 - Check a record file for encoding damage (BOM / double-encoding)
+- **When to use:** after any edit to a record file, and **before committing** one.
+- **Background:** a `C3 A2` byte pair at the start of a run means UTF-8 was
+  double-encoded (e.g. em dash `E2 80 94` stored as `C3 A2 C2 80 C2 94`). See
+  `CAPA.md` NC-009, NC-011 and NC-012. The record files were cleaned in NC-012
+  (option (a)), so the baseline is now **zero** - any mojibake or BOM is a new
+  regression.
+- **Steps:**
+  1. From the repo root, run the byte-level scanner:
+     `powershell -ExecutionPolicy Bypass -File tools\check-record-encoding.ps1`
+  2. It reads raw bytes (never PowerShell string cmdlets, which re-encode) and
+     fails any record file that has a UTF-8 BOM or a `C3 A2` / `C2 A0` byte pair.
+     For a single file by hand:
+     `python -c "import pathlib;b=pathlib.Path('PROGRESS.md').read_bytes();print('BOM',b[:3]==b'\xef\xbb\xbf');print('C3A2',b.count(b'\xc3\xa2'))"`
+  3. Make edits with the `str_replace` file editor. If a byte-level write is
+     unavoidable, use
+     `[System.IO.File]::WriteAllText($p, $t, (New-Object System.Text.UTF8Encoding($false)))`.
+- **Verify:** the final line reads `RECORD-ENCODING: PASS` and the exit code is
+  `0` (0 mojibake pairs, 0 BOMs).
+- **Failure mode:** a file reports mojibake/BOM -> the edit was written through a
+  re-encoding path (NC-009/NC-011/NC-012). Revert that edit and re-apply it with
+  `str_replace`.
+

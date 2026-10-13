@@ -2,39 +2,39 @@
 
 **Duty:** the plan of record - phase -> task -> step, with status, plus the open-questions parking lot.
 
-Phase â†’ Task â†’ Step. The plan of record.
+Phase → Task → Step. The plan of record.
 
-**Status key:** `[ ]` todo Â· `[~]` in progress Â· `[x]` done Â· `[!]` blocked
+**Status key:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked
 
 **Companion doc:** `ARTICLES-HANDLING.md` explains the MyISAM rules, the URL rule
 options, and the SEO strategy in plain language.
 
 ## Target architecture (approved 2026-10-10)
 
-- `frontend/` â€” Next.js (App Router) + React + TypeScript. UI: Tailwind CSS +
+- `frontend/` — Next.js (App Router) + React + TypeScript. UI: Tailwind CSS +
   shadcn/ui (Radix), `next/image`, `lucide-react` icons, Embla carousel,
   TanStack Query (data), Zod (validation), Framer Motion (tasteful animation),
   next-themes (dark mode), Recharts (admin dashboards).
-- `backend/` â€” Spring Boot 3.x on **Java 17**, packaged for **WildFly 27.0.0.Final**
+- `backend/` — Spring Boot 3.x on **Java 17**, packaged for **WildFly 27.0.0.Final**
   (Jakarta EE 10). Spring Web (REST), Spring Data JPA (Hibernate 6), Spring
   Security (JWT), Bean Validation, MapStruct + Lombok,
   springdoc-openapi (Swagger UI), Caffeine/Redis cache. Logging: SLF4J + Logback.
-- Deployment â€” **frontend on IIS**, **backend on WildFly 27**; IIS reverse-proxies
+- Deployment — **frontend on IIS**, **backend on WildFly 27**; IIS reverse-proxies
   `/api` and SSR traffic to WildFly. Java 17 everywhere.
-- Database â€” the existing **MariaDB 10.6.16** (`vivalanka`). **Schema frozen**
+- Database — the existing **MariaDB 10.6.16** (`vivalanka`). **Schema frozen**
   (`rcsiteweb/db/dbschema.sql` is the read-only reference; D-004, D-008, D-014).
-- Search â€” **keep Apache Solr** (D-011).
-- Removed from scope â€” **AI article generation** (D-010) and the **commerce
+- Search — **keep Apache Solr** (D-011).
+- Removed from scope — **AI article generation** (D-010) and the **commerce
   storefront** (D-009).
-- `rcsiteweb/` â€” legacy app kept read-only as the behavioural reference.
-- `credentials/` â€” all local secrets, **gitignored** (D-005). Live credentials are
+- `rcsiteweb/` — legacy app kept read-only as the behavioural reference.
+- `credentials/` — all local secrets, **gitignored** (D-005). Live credentials are
   in `C:\allcredentials\Credentials.md` (outside the repo).
 
 ## Testing strategy & smoke-test convention
 
 - **Backend:** JUnit 5 + Mockito unit tests; `@DataJpaTest` on a disposable DB;
   `@SpringBootTest`/MockMvc for API paths. (Adopt `claude/project-level-testing-rules`
-  where it fits â€” `should_[expected]_when_[condition]`, AAA, same package as SUT.)
+  where it fits — `should_[expected]_when_[condition]`, AAA, same package as SUT.)
 - **Frontend:** Playwright E2E + `axe` accessibility checks; Lighthouse SEO/Perf
   gate on the sample article.
 - **API contract:** OpenAPI spec adds a schema-diff check (catches accidental
@@ -47,11 +47,11 @@ options, and the SEO strategy in plain language.
   (3) reported with its output. A phase is not `done` until its smoke test passes.
 - **CI gate:** build + unit tests + the URL contract suite + a secret scan.
 
-## The URL contract â€” MUST NOT CHANGE (D-003)
+## The URL contract — MUST NOT CHANGE (D-003)
 
 Google has indexed millions of pages. Every URL below must keep resolving.
-Where possible use a **rewrite** (URL stays the same, 200) â€” never a redirect
-that drops the path â€” so no ranking is lost. Only `/slcommunity/` is out of
+Where possible use a **rewrite** (URL stays the same, 200) — never a redirect
+that drops the path — so no ranking is lost. Only `/slcommunity/` is out of
 scope (D-012).
 
 | Public URL | What it serves | 200 or 301? |
@@ -66,58 +66,58 @@ scope (D-012).
 | `/news/sitemap.jsp` | sitemap | 200 (keep); new `/sitemapindex.xml` (D-025) |
 | `/feed`, RSS/Atom | syndication | 200 (keep) |
 | `robots.txt` | crawler rules | 200 (keep) |
-| `/slcommunity/*` | WordPress blog | **out of scope** (D-012) â€” stays as-is |
+| `/slcommunity/*` | WordPress blog | **out of scope** (D-012) — stays as-is |
 
 **SEO fixture (regression case):** article `article_id = 12272011`, alias
 `court-rejects-shiranthi-s-bail-application`, must stay reachable at
 `https://www.vivalanka.com/newspage/12272011ai-court-rejects-shiranthi-s-bail-application`.
 
 **Verified legacy URL rules (from `ROOT/news/page.jsp`):**
-- `articleIDString = URI.substring(10, URI.indexOf("ai-"))` â€” assumes
+- `articleIDString = URI.substring(10, URI.indexOf("ai-"))` — assumes
   `/newspage/` is exactly 10 chars. The new handler must be **prefix-based**, not
   a fixed offset, so a trailing slash or extra segment cannot break it.
 - Numeric **`dcode` replaces `article_id`** in the canonical URL once the article
   is loaded (`dcode` wins).
-- No alias â‡’ `/news/page.jsp?articleid={id}`.
-- `dcode` containing **`_short`** â‡’ body = description with HTML stripped.
-- `dcode` containing **`hosted`** â‡’ listing links stay internal (not the external `url`).
+- No alias ⇒ `/news/page.jsp?articleid={id}`.
+- `dcode` containing **`_short`** ⇒ body = description with HTML stripped.
+- `dcode` containing **`hosted`** ⇒ listing links stay internal (not the external `url`).
 - Date shown prefers **`updated`**, falling back to **`published`**.
-- `aproval_status = '4'` â‡’ not published (serve 404/410, not the article).
-- **Sample data (owner):** article `12272011` has `dcode = "hosted"` â€” a
+- `aproval_status = '4'` ⇒ not published (serve 404/410, not the article).
+- **Sample data (owner):** article `12272011` has `dcode = "hosted"` — a
   **non-numeric** value, so the canonical stays `/newspage/12272011ai-{alias}`
   (`article_id`), not `dcode`. See D-018.
 
 **Resolved:** the production prefix is **`/newspage/`** at the domain root
-(owner, Q11) â€” see D-016.
+(owner, Q11) — see D-016.
 
 ---
 
-## Phase 0 â€” Discovery & safety net
+## Phase 0 — Discovery & safety net
 
-- [x] GitHub repo confirmed **public, `main`, empty** â€” this tree is the source
+- [x] GitHub repo confirmed **public, `main`, empty** — this tree is the source
       (treated as first commit at cutover).
 - [x] Schema is **provided** and frozen: `rcsiteweb/db/dbschema.sql` (31 tables).
       Never written to (D-014). Bootstrap is a plain load, not Flyway (no
-      migrations â€” D-004/D-008).
+      migrations — D-004/D-008).
 - [x] Content split resolved (Q3/D-015): only `articles` is used.
-- [x] URL inventory built from the **live site** and frozen â€” `URL-INVENTORY.md`,
+- [x] URL inventory built from the **live site** and frozen — `URL-INVENTORY.md`,
       `tools/url-contract.ps1`, `tools/url-inventory/url-contract.json`
       (**20/20 PASS**).
-- [x] Security audit of the legacy app â€” `SECURITY-NOTES.md` (plaintext passwords,
+- [x] Security audit of the legacy app — `SECURITY-NOTES.md` (plaintext passwords,
       SQL injection, Java 8, log4j 1.x).
 - [x] Keep the committed connection credentials as-is (D-023); new stack ignores
       them. Legacy stays read-only.
 - [ ] Local dev stack: Docker Compose with a **MariaDB 10.6** clone
-      (schema + config seed) + Solr â€” `tools/local-stack/docker-compose.yml`
+      (schema + config seed) + Solr — `tools/local-stack/docker-compose.yml`
       (+`tools/db-load.ps1`). *(Not runnable in this sandbox: no Docker/Maven/MySQL.)*
-- [ ] WildFly 27 datasource + JDBC module â€” `tools/wildfly/` (D-017).
+- [ ] WildFly 27 datasource + JDBC module — `tools/wildfly/` (D-017).
 - [x] URL-contract regression harness (runs against legacy now, new app later).
 
 **Smoke test (end of Phase 0):** the local stack starts; the harness reports every
 frozen URL as 200 against the legacy preview; no secret value is present anywhere
 in the git tree.
 
-## Phase 1 â€” Backend foundation (Spring Boot 3 on Java 17, WildFly 27)
+## Phase 1 — Backend foundation (Spring Boot 3 on Java 17, WildFly 27)
 
 - [x] Spring Boot skeleton in `backend/`, package `com.rev_creations.rcsite`;
       packaged as a **WAR** for **WildFly 27** (Jakarta EE 10 -> `jakarta.*`,
@@ -145,16 +145,16 @@ fields (title, description, details, image, thumbnail, categoryid, author_name,
 author_intro, entry_date, published, updated, url, alias, dcode, aproval_status);
 lookup by `dcode` returns the same row; Swagger UI loads; no credentials in source.
 
-## Phase 2 â€” SEO-critical endpoints & URL parity
+## Phase 2 — SEO-critical endpoints & URL parity
 
 - [x] Server-render `/newspage/{id}ai-{alias}` (and the numeric-`dcode` variant)
       with the exact canonical, `<title>`, meta description and OG/Twitter tags the
       legacy page emits.
-- [x] Honour the `dcode` rules: numeric wins; `_short` â‡’ stripped-description body;
-      `hosted` â‡’ internal link; `aproval_status='4'` â‡’ not published.
+- [x] Honour the `dcode` rules: numeric wins; `_short` ⇒ stripped-description body;
+      `hosted` ⇒ internal link; `aproval_status='4'` ⇒ not published.
 - [x] Serve `/news/page.jsp?articleid=`, `/n/p?i={id}`, `/mobile/{id}ci-{alias}`.
 - [x] Sitemap: serve `/sitemapindex.xml` (+ the secondary
-      `/sitemapindex04302022.xml`) pointing at `/sitemap_{n}.xml` shards â€” the
+      `/sitemapindex04302022.xml`) pointing at `/sitemap_{n}.xml` shards — the
       **legacy names** (~204 shards, ~10k URLs each, ~2M total; D-025). Generated
       from `articles`, newest first. `robots.txt` mirrors production
       (`frontend/public/robots.txt`). See `URL-INVENTORY.md`.
@@ -165,7 +165,7 @@ lookup by `dcode` returns the same row; Swagger UI loads; no credentials in sour
 canonical and equivalent head metadata vs legacy; the numeric-`dcode` form also
 returns 200; sitemap contains the sample; `curl -I` shows 200 (not 301).
 
-## Phase 3 â€” Frontend foundation (Next.js + React)
+## Phase 3 — Frontend foundation (Next.js + React)
 
 - [x] Next.js App Router app in `frontend/`; Tailwind + brand design tokens
   (`tailwind.config.js`, `postcss.config.js`, `src/app/globals.css`). shadcn/ui
@@ -182,10 +182,10 @@ returns 200; sitemap contains the sample; `curl -I` shows 200 (not 301).
   this host; SEO signals asserted from the served HTML instead).
 
 **Smoke test (end of Phase 3):** article page renders the sample end-to-end
-(API â†’ SSR HTML); Lighthouse SEO â‰¥ 95 and Performance â‰¥ 90 on the sample;
+(API → SSR HTML); Lighthouse SEO ≥ 95 and Performance ≥ 90 on the sample;
 usable at 360 px and 1440 px widths.
 
-## Phase 4 â€” Search, categories & listings
+## Phase 4 — Search, categories & listings
 
 - [x] Solr integration (proxy the existing `/news` collection; D-011).
       Backend `SearchService`/`SolrProperties` call Solr's HTTP JSON API directly
@@ -207,7 +207,7 @@ usable at 360 px and 1440 px widths.
 **Smoke test (end of Phase 4):** a known query returns the same top results as
 legacy; category listing and pagination match; `layout=plain` renders for iframes.
 
-## Phase 5 â€” Legacy URL preservation & mobile
+## Phase 5 — Legacy URL preservation & mobile
 
 - [x] IIS URL-rewrite / reverse-proxy rules so every contract URL resolves
       unchanged; Next.js `rewrites` for the app-owned paths. Delivered as
@@ -234,7 +234,7 @@ the three extra sample articles (`12247832`, `12247828`, `12247838`) that are
 **not in the local DB** - a local-data limit, not a routing gap; every
 structural path passes.
 
-## Phase 6 â€” Content, feeds & media
+## Phase 6 — Content, feeds & media
 
 - [x] Port `FeedGenerator` (YouTube/Atom), `GenerateRSS`, `SearchUpdater` as
       scheduled jobs writing `feed_article` / `feed_channel_log` and updating
@@ -263,20 +263,24 @@ article's category 3). The 3 bundled channels point at dead YouTube playlist URL
 (real legacy data), so a live poll logs `http 404` - exactly the recorded-and-
 continue path.
 
-## Phase 7 â€” Admin & authentication
+## Phase 7 — Admin & authentication
 
-- [ ] Spring Security + JWT for the admin area; roles from `usertype`.
-- [ ] Authenticate against the existing **`rc_customer`** table (D-022).
-- [ ] Verify how `rc_customer.pword` is stored and design auth accordingly
-      (NC-006 â€” weak-hash handling; a schema change would need owner approval).
+- [x] Spring Security + JWT for the admin area; roles from `usertype`.
+      Done (D-036): stateless HS256 bearer JWT; roles from `rc_customer.type` ->
+      `usertype`. `POST /api/auth/login`, `GET /api/auth/me`.
+- [x] Authenticate against the existing **`rc_customer`** table (D-022).
+      Done: identity is `rc_customer.username`; no schema change.
+- [x] Verify how `rc_customer.pword` is stored and design auth accordingly
+      (storage is plaintext; `LegacyPasswordVerifier` refuses it unless
+      `rcsite.auth.allow-legacy-plaintext` is enabled; NC-006 rehash still needs owner approval, D-004).
 - [ ] React admin UI: article, category, feed, config, email screens (drop
       commerce screens).
 
-**Smoke test (end of Phase 7):** admin login works; create â†’ edit â†’ publish an
+**Smoke test (end of Phase 7):** admin login works; create → edit → publish an
 article round-trips and appears at its `/newspage/` URL; the published row is read
 back through the public API.
 
-## Phase 8 â€” Cutover
+## Phase 8 — Cutover
 
 - [ ] IIS keeps the WordPress site on `/slcommunity/` and reverse-proxies the app
       paths + `/api` to WildFly; TLS; caching (D-007).
@@ -289,34 +293,34 @@ rollback plan tested.
 
 ---
 
-## Open questions â€” status
+## Open questions — status
 
 All planning questions are now **resolved** except a few "nice to have" items.
 
 | # | Question | Answer | Record |
 |---|---|---|---|
-| Q3 | `articles2`/`articles3`? | Ignored â€” no live articles | D-015 |
+| Q3 | `articles2`/`articles3`? | Ignored — no live articles | D-015 |
 | Q4 | Mobile URLs indexed? | Keep (200) | D-003 |
 | Q11 | URL prefix / `dcode` | `/newspage/` at root; sample `dcode="hosted"` | D-016, D-018 |
 | Q12 | WildFly packaging | WAR + WildFly datasource (JNDI) | D-017 |
 | Q13/Q14 | MyISAM writes / article write path | Stay MyISAM forever; `articles` is written | D-008 |
 | Q15/Q16 | Solr host / re-index | Reuse the existing index as-is | D-011 |
-| Q17 | `article_category_has_articles` | News app must not touch it â†’ guard test | D-019 |
+| Q17 | `article_category_has_articles` | News app must not touch it → guard test | D-019 |
 | Q19 | Media path | `/custom/images/` + `/custom/media*` | D-021, D-024 |
 | Q20 | Sitemap | `/sitemapindex.xml` + `/sitemap_{n}.xml` + `robots.txt` | D-020, D-025 |
 | Q9/Q10 | Auth source | Existing `rc_customer` | D-022 |
 | Q5 | Hosting | IIS + WildFly on the same box | D-007 |
-| NC-001/NC-007 | Rotate the committed creds? | No â€” leave them; new stack doesn't use them | D-023 |
+| NC-001/NC-007 | Rotate the committed creds? | No — leave them; new stack doesn't use them | D-023 |
 | GitHub | Repo access | Public, `main`, **empty** (no commits); tree here is the source | PROGRESS |
 
 **Still to confirm (non-blocking, in Phase 0):**
 
-- [ ] **`rc_customer.pword` format** â€” **resolved**: stored **plaintext** (not
+- [ ] **`rc_customer.pword` format** — **resolved**: stored **plaintext** (not
       hashed). NC-006; auth redesign needs owner-approved hash storage.
-- [x] **Solr details** â€” production query name is still to confirm, but the
+- [x] **Solr details** — production query name is still to confirm, but the
       web search namespace is `/rcsearch/` (bot-only; see `URL-INVENTORY.md`).
-- [ ] **WildFly JNDI name** â€” datasource JNDI name to bind (working default
+- [ ] **WildFly JNDI name** — datasource JNDI name to bind (working default
       `java:/jdbc/rcsite`); DB credentials live on WildFly.
-- [ ] **Sinhala/Tamil language switch** â€” confirm whether it is a category or a
+- [ ] **Sinhala/Tamil language switch** — confirm whether it is a category or a
       field, for `hreflang` and listing filters.
-- [ ] **Search Console access** â€” for the cutover checks in Phase 8.
+- [ ] **Search Console access** — for the cutover checks in Phase 8.

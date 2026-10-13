@@ -1,4 +1,4 @@
-﻿# DATABASE.md
+# DATABASE.md
 
 **Duty:** the data dictionary - one entry per table, plus the DB rules.
 
@@ -11,25 +11,25 @@ never drift.
 - **Engine:** MariaDB 10.6.16 (`5.5.5-10.6.16-MariaDB-log`), server `10.170.1.6`.
   Database name: **`vivalanka`**. Dump: MySQL 8.0.44 `mysqldump`
   (`rcsiteweb/db/dbschema.sql`).
-- **Table engine:** mixed â€” mostly **MyISAM**, a few InnoDB
+- **Table engine:** mixed — mostly **MyISAM**, a few InnoDB
   (`rcsite_config`, `readme`, `articles2`, `feed_channel_log`). MyISAM has **no
   transactions and no foreign keys**, with table-level locking. This shapes how
   the new JPA layer must behave. **Do not convert engines without owner approval.**
-- **Charsets:** mixed â€” `utf8mb3` (legacy 3-byte UTF-8) and `latin1`. `utf8mb3`
+- **Charsets:** mixed — `utf8mb3` (legacy 3-byte UTF-8) and `latin1`. `utf8mb3`
   cannot store 4-byte characters (emoji, some script marks). Leave as-is unless
   approved.
 - **Migrations:** none. The schema is fixed and owner-provided (D-004, D-008). Load `rcsiteweb/db/dbschema.sql` (DDL) as-is, then the seed files. No migration tool, no versioned migrations, and no schema drift.
-  The legacy `rcsiteweb/db/001â€“016` files are **seed data (`INSERT` only)**;
+  The legacy `rcsiteweb/db/001–016` files are **seed data (`INSERT` only)**;
   `rcsiteweb/db/dbschema.sql` is the **DDL**. Versioned files only; never edit an
   applied migration.
 - **Schema changes:** none without owner approval (D-004, D-008).
 - **Naming:** snake_case; `_id`/`id` keys as they already exist; repeating values
   in lookup tables.
 
-## Content tables â€” decided
+## Content tables — decided
 
 **Only `articles` is used.** The owner confirmed `articles2` and `articles3`
-are **not required** and hold **no live articles** â€” they are **ignored**
+are **not required** and hold **no live articles** — they are **ignored**
 (do not build entities, mappers, or lookups for them). This removes the earlier
 content-split risk (Q3 closed).
 
@@ -41,7 +41,7 @@ content-split risk (Q3 closed).
 
 ### articles
 - **Writable:** news app **writes** here (admin publish, feed ingest).
-- **MyISAM forever** (owner, Q13/Q14) â‡’ no transactions, table-level locking.
+- **MyISAM forever** (owner, Q13/Q14) ⇒ no transactions, table-level locking.
   Write paths must be single-statement or accept non-atomic behaviour.
 
 ## Table dictionary (31 tables)
@@ -57,13 +57,13 @@ content-split risk (Q3 closed).
   `feed_channel_id`, `process_status`, `alias`, `thumbnail`, `keywords`.
 - **Indexes:** `categoryid`, `aproval_status`, `entry_date`, `process_status`,
   `feed_channel_id`. **No unique index on `alias` or `dcode`.**
-- **Joins:** `categoryid` â†’ `article_category.categoryid`;
-  `feed_channel_id` â†’ `feed_channel.id`.
+- **Joins:** `categoryid` → `article_category.categoryid`;
+  `feed_channel_id` → `feed_channel.id`.
 - **Rules:** `aproval_status = '4'` means not published. `dcode` is a free-form
-  string â€” numeric, or containing `_short` / `hosted`, or a full URL. `description`
+  string — numeric, or containing `_short` / `hosted`, or a full URL. `description`
   and `details` are `text` (64 KB cap) here but `longtext` in `articles2/3`.
-- **URL rule:** canonical `/newspage/{dcode|article_id}ai-{alias}` â€” numeric
-  `dcode` wins; no alias â‡’ `/news/page.jsp?articleid={id}`. Listing links may
+- **URL rule:** canonical `/newspage/{dcode|article_id}ai-{alias}` — numeric
+  `dcode` wins; no alias ⇒ `/news/page.jsp?articleid={id}`. Listing links may
   point straight at `url` (external) unless `dcode` contains `hosted`.
 
 ### articles2, articles3
@@ -75,13 +75,13 @@ content-split risk (Q3 closed).
 - **Key:** PK `categoryid` (int unsigned, AUTO_INCREMENT=113).
 - **Columns:** `categoryid`, `parentid`, `category_name`, `title`, `description`,
   `level`, `priority`, `active`.
-- **Joins:** `parentid` â†’ `article_category.categoryid` (self, hierarchy).
-- **Note:** engine MyISAM, **charset latin1** â€” check before storing non-ASCII.
+- **Joins:** `parentid` → `article_category.categoryid` (self, hierarchy).
+- **Note:** engine MyISAM, **charset latin1** — check before storing non-ASCII.
 
 ### article_category_has_articles
 - **Duty:** many-to-many link between categories and articles. Composite PK
   (`categoryid`, `article_id`); AUTO_INCREMENT=12,330,553.
-- **Note:** **not referenced anywhere in this codebase** â€” used by another app
+- **Note:** **not referenced anywhere in this codebase** — used by another app
   (likely the Solr indexer / commerce). Confirm before relying on it.
 
 ### article_category_has_feed_channel
@@ -96,32 +96,32 @@ content-split risk (Q3 closed).
 - **Columns:** `id`, `name`, `link`, `poll_interval`, `feed_active`, `feed_type`,
   `poll_interval_min`, `poll_interval_max`, `source_site`, `next_poll`,
   `last_poll`, `default_category_id`, `comment`.
-- **Joins:** `default_category_id` â†’ `article_category.categoryid`.
+- **Joins:** `default_category_id` → `article_category.categoryid`.
 
 ### feed_article
 - **Duty:** one row is one raw item pulled from a feed (staging before it becomes
-  an article). Key PK `id`; `channel_id` â†’ `feed_channel.id`; has `processed`.
+  an article). Key PK `id`; `channel_id` → `feed_channel.id`; has `processed`.
 
 ### feed_channel_log
-- **Duty:** feed poll log/errors. PK `id`; `channel_id` â†’ `feed_channel.id`.
+- **Duty:** feed poll log/errors. PK `id`; `channel_id` → `feed_channel.id`.
 
 **Geolocation**
 
 ### geo_location
-- **Duty:** MaxMind GeoIP location rows. **No primary key** â€” indexed on
+- **Duty:** MaxMind GeoIP location rows. **No primary key** — indexed on
   `country`, `region`, `location_id`.
 ### geo_blocks
-- **Duty:** IP-range â†’ location mapping. PK `start_ip_num`; `loc_id` â†’ `geo_location`.
+- **Duty:** IP-range → location mapping. PK `start_ip_num`; `loc_id` → `geo_location`.
 ### location_article_category
 - **Duty:** maps a location to the categories to show there. PK `id`;
-  `category_id` â†’ `article_category.categoryid`; `location_id` â†’ `geo_location`.
+  `category_id` → `article_category.categoryid`; `location_id` → `geo_location`.
 
 **Users / staff**
 
 ### rc_customer
 - **Duty:** site user / login. PK `username`. Has `pword varchar(20)`,
   `customer` (unique), `type`, `consultant`, `email`. **Security: `pword` is 20
-  chars â€” verify it is properly hashed (see CAPA NC-006).**
+  chars — verify it is properly hashed (see CAPA NC-006).**
 
 ### usertype
 - **Duty:** lookup of user roles. PK `usertypeid`, `usertypename`.
@@ -139,14 +139,14 @@ content-split risk (Q3 closed).
 
 ### email, email_report
 - **Duty:** outbound email queue (`email`, PK `emailid`) and its send results
-  (`email_report`, PK `reportid`, `emailid` â†’ `email.emailid`).
+  (`email_report`, PK `reportid`, `emailid` → `email.emailid`).
 
 ### directory, rc_category, readme, webui
-- **directory** â€” submitted link directory (PK `link_id`).
-- **rc_category** â€” user-submitted categories (PK `category_id`).
-- **readme** / **webui** â€” small config/content tables.
+- **directory** — submitted link directory (PK `link_id`).
+- **rc_category** — user-submitted categories (PK `category_id`).
+- **readme** / **webui** — small config/content tables.
 
-**Commerce â€” OUT OF SCOPE (dropped, D-009)**
+**Commerce — OUT OF SCOPE (dropped, D-009)**
 
 `customers`, `orders`, `order_items`, `order_charges`, `products`,
 `product_categories`, `product_options`, `product_attributes`, `prodxcat`.

@@ -12,11 +12,11 @@ happen next, this file wins.
 
 | # | Item | Status | Notes |
 |---|------|--------|-------|
-| 1 | ~~Resolve content split: role of `articles2` / `articles3`~~ | done | D-015 â€” ignored, no live articles |
-| 2 | Keep the committed `OfficeConnection`/`TrainingConnection` creds as-is | done | D-023 â€” owner: no rotation; new stack doesn't use them |
+| 1 | ~~Resolve content split: role of `articles2` / `articles3`~~ | done | D-015 — ignored, no live articles |
+| 2 | Keep the committed `OfficeConnection`/`TrainingConnection` creds as-is | done | D-023 — owner: no rotation; new stack doesn't use them |
 | 3 | `robots.txt` (production-faithful) | done | D-020; `frontend/public/robots.txt` |
 | 4 | `article_category_has_articles` guard (test + script) | done | D-019; `ForbiddenTableUsageTest`, `tools/check-forbidden-tables.ps1` |
-| 5 | Read the (empty) GitHub repo / confirm tree | done | Public, `main`, no commits â€” this tree is the source |
+| 5 | Read the (empty) GitHub repo / confirm tree | done | Public, `main`, no commits — this tree is the source |
 | 6 | Freeze the URL contract as a regression suite | open | D-003/D-013/D-016/D-018; sample `/newspage/12272011ai-...` |
 | 7 | Scaffold `credentials/` + env-var loading (backend & frontend) | done | D-005; folder + `.example` templates created |
 | 8 | Backend: Spring Boot WAR (Java 17) + WildFly JNDI datasource | built | D-017; `backend/pom.xml` + wildfly profile |
@@ -35,34 +35,36 @@ happen next, this file wins.
 | 21 | Backend: feed ingestion job (poll/parse/stage/log/reschedule) | done | TASK-PLAN Phase 6; D-034; `FeedScheduler`+`FeedPollService`+`FeedParser`+`FeedFetchService`; upsert on guid |
 | 22 | Backend + edge: public RSS (`/api/rss`, `/rss`) | done | TASK-PLAN Phase 6; D-033; legacy defaults (category 7, 10 items); link rule shared with the sitemap |
 | 23 | Media: image upload/resize (`ImageHelper`/`Scalr`) | blocked | D-035; needs an owner storage decision **and** Phase 7 auth - an unauthenticated upload is an arbitrary-file-write hole |
+| 24 | Backend: Spring Security + JWT auth foundation (`POST /api/auth/login`, `GET /api/auth/me`, roles from `usertype`) | done | D-036; `rc_customer` reused as-is (no schema change); `LegacyPasswordVerifier` refuses plaintext unless allowed (NC-006); `mvn test` 71/71 green |
+| 25 | Frontend: React admin UI (article/category/feed/config screens; drop commerce) | open | TASK-PLAN Phase 7; wire the JWT (bearer) into `frontend/`; media screens depend on item 23 (D-035) |
 
 ## Locked technical decisions
 
 *(These live in `DECISIONS.md`. Listed here only as a short reminder, with the
 `D-NNN` for each - never a second copy.)*
 
-- Revamp to Next.js + Spring Boot â€” D-001
-- Do not reuse `rcsiteJPA` â€” D-002
-- Legacy URL pattern must not change â€” D-003
-- Do not change the DB schema â€” D-004
-- Credentials in `credentials/`, env vars at run time â€” D-005
-- Logging via SLF4J + Logback â€” D-006
-- Next.js on IIS, Spring Boot WAR on WildFly 27, Java 17, WildFly JNDI datasource â€” D-007, D-017
-- Keep engines/charsets/shape exactly (schema freeze, MyISAM forever) â€” D-008
-- Drop the commerce storefront â€” D-009
-- No AI features; keep traditional SEO â€” D-010, D-010b
-- Keep Apache Solr, reuse the index â€” D-011
-- Only `/slcommunity/` out of scope â€” D-012
-- `dcode` URL variants must resolve â€” D-013
-- Do not write `dbschema.sql` â€” D-014
-- `articles2`/`articles3` ignored â€” D-015
-- URL prefix `/newspage/` at the domain root â€” D-016
-- `dcode="hosted"` is the standard (non-numeric) case â€” D-018
-- News app never touches `article_category_has_articles` â€” D-019
-- `/sitemapindex.xml` + `/sitemap_{n}.xml` + `robots.txt` â€” D-020, D-025
-- Media base path `/custom/images/` â€” D-021
-- Auth uses the existing `rc_customer` table â€” D-022
-- Keep the committed connection-file credentials as-is â€” D-023
+- Revamp to Next.js + Spring Boot — D-001
+- Do not reuse `rcsiteJPA` — D-002
+- Legacy URL pattern must not change — D-003
+- Do not change the DB schema — D-004
+- Credentials in `credentials/`, env vars at run time — D-005
+- Logging via SLF4J + Logback — D-006
+- Next.js on IIS, Spring Boot WAR on WildFly 27, Java 17, WildFly JNDI datasource — D-007, D-017
+- Keep engines/charsets/shape exactly (schema freeze, MyISAM forever) — D-008
+- Drop the commerce storefront — D-009
+- No AI features; keep traditional SEO — D-010, D-010b
+- Keep Apache Solr, reuse the index — D-011
+- Only `/slcommunity/` out of scope — D-012
+- `dcode` URL variants must resolve — D-013
+- Do not write `dbschema.sql` — D-014
+- `articles2`/`articles3` ignored — D-015
+- URL prefix `/newspage/` at the domain root — D-016
+- `dcode="hosted"` is the standard (non-numeric) case — D-018
+- News app never touches `article_category_has_articles` — D-019
+- `/sitemapindex.xml` + `/sitemap_{n}.xml` + `robots.txt` — D-020, D-025
+- Media base path `/custom/images/` — D-021
+- Auth uses the existing `rc_customer` table — D-022
+- Keep the committed connection-file credentials as-is — D-023
 - API contract stays at `/api/` (no `/api/v1/`) — D-026
 - Search proxied to Solr's HTTP JSON API; public `/search` for humans, bot-only `/rcsearch/news` — D-027
 - Category pages at the frozen JSP paths, keyed on the section category — D-028
@@ -73,3 +75,4 @@ happen next, this file wins.
 - RSS at `/api/rss`, public at the additive `/rss` — D-033
 - Feed poll de-duplicates on guid; scheduler off in tests — D-034
 - Image upload deferred until storage is decided and auth exists — D-035
+- Admin auth is stateless JWT over `rc_customer`, roles from `usertype` — D-036

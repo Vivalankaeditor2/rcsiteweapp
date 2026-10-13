@@ -5,15 +5,15 @@
 **The journal. The single source of truth for what was done.**
 
 - Append-only. Newest entries go at the **bottom**.
-- Every entry: gate Â· area Â· status Â· detail.
-- Never edit old entries â€” corrections are new entries.
+- Every entry: gate · area · status · detail.
+- Never edit old entries — corrections are new entries.
 
 ---
 
-### [M0] 2026-10-10 â€” Session open
+### [M0] 2026-10-10 — Session open
 
 - **Gate:** M0 Session open
-- **Area:** â€”
+- **Area:** —
 - **Status:** done
 - **Views:** none
 - **Detail:** Records initialised (bootstrap). All 10 record files now exist at
@@ -21,11 +21,11 @@
   web application with JSP/servlets, Hibernate/JPA and a MariaDB/MySQL schema in
   `rcsiteweb/db/`) and `claude/` (project-level assistant rules). Next: install Java 17 + Maven to build the backend (Phase 1).
 
-### [M1] 2026-10-10 â€” Revamp plan set (Next.js + React + Spring Boot)
+### [M1] 2026-10-10 — Revamp plan set (Next.js + React + Spring Boot)
 
 - **Gate:** M1 Plan
 - **Area:** whole project / planning
-- **Status:** in-progress (awaiting owner approval â€” no code written)
+- **Status:** in-progress (awaiting owner approval — no code written)
 - **Views:** TASK-PLAN.md, DECISIONS.md, CAPA.md, CODE-FIX-PLAN.md, DATABASE.md,
   AGENTS.md, BUILD-SPEC.md, README.md
 - **Detail:** Owner asked to revamp VivaLanka.com (`rcsiteweb`) using Next.js +
@@ -41,15 +41,15 @@
   changed.** Blocked: GitHub repo `Vivalankaeditor2/rcsiteweapp` returned Bad
   credentials (expired token); DB schema export pending.
 
-### [M1] 2026-10-10 â€” Owner answers folded in; plan reviewed for gaps
+### [M1] 2026-10-10 — Owner answers folded in; plan reviewed for gaps
 
 - **Gate:** M1 Plan
 - **Area:** whole project / planning
-- **Status:** in-progress (awaiting approval â€” no code written)
+- **Status:** in-progress (awaiting approval — no code written)
 - **Views:** TASK-PLAN.md, DECISIONS.md, CAPA.md, CODE-FIX-PLAN.md, DATABASE.md,
   AGENTS.md, BUILD-SPEC.md, README.md
 - **Detail:** Folding in the owner's answers: Java **17**; schema **provided**
-  (`rcsiteweb/db/dbschema.sql`, 31 tables â€” now fully documented in `DATABASE.md`,
+  (`rcsiteweb/db/dbschema.sql`, 31 tables — now fully documented in `DATABASE.md`,
   closing NC-008); **keep Solr**; drop **commerce** and **AI**; only
   `/slcommunity/` out of scope; deploy **Next.js on IIS** + **Spring Boot on
   WildFly 27**. Added D-007..D-014. Added CAPA NC-005 (SQL injection),
@@ -58,11 +58,11 @@
   backend to Java 17/WildFly, added the **MyISAM read-only** persistence rule,
   added the full **URL contract with the `dcode` variants** (numeric wins, `_short`,
   `hosted`) and the `aproval_status='4'` rule. **New risk found:** the dump
-  contains `articles`, `articles2` and `articles3` â€” content split must be
+  contains `articles`, `articles2` and `articles3` — content split must be
   confirmed (Q3) before building the article lookup. Outstanding owner questions:
-  Q3, Q4, Q11â€“Q20. **No application code changed.**
+  Q3, Q4, Q11–Q20. **No application code changed.**
 
-### [M1] 2026-10-10 â€” Clarifications answered; first support files built
+### [M1] 2026-10-10 — Clarifications answered; first support files built
 
 - **Gate:** M1 Plan (+ first M2 deliverables)
 - **Area:** whole project
@@ -70,25 +70,25 @@
 - **Views:** TASK-PLAN.md, DECISIONS.md, CAPA.md, CODE-FIX-PLAN.md, DATABASE.md,
   AGENTS.md, BUILD-SPEC.md, README.md, ARTICLES-HANDLING.md
 - **Detail:** Owner answered all planning questions and asked for four things.
-  (a) **`articles2`/`articles3` ignored** (D-015) â€” the content-split risk is gone.
+  (a) **`articles2`/`articles3` ignored** (D-015) — the content-split risk is gone.
   (b) **MyISAM explained** in the new plain-language companion doc
   `ARTICLES-HANDLING.md` (no transactions / FK / row locks; the JPA rules that
   follow). (c) **URL rules + options + SEO strategy** documented in the same file,
   with the recommendation to keep the traditional, framework-agnostic SEO
   (D-010b). (d) **Built support files:** `frontend/public/robots.txt`,
   `frontend/public/sitemap.xml` + `frontend/public/sitemaps/{pages,news-1}.xml`
-  (D-020), and the **forbidden-table guard** â€” `ForbiddenTableUsageTest.java` and
+  (D-020), and the **forbidden-table guard** — `ForbiddenTableUsageTest.java` and
   `tools/check-forbidden-tables.ps1`, **verified** (clean PASS; FAILS on a planted
   offender, then clean again). Also added D-016..D-023, closed NC-001 (owner
   accepted the risk, D-023) and re-scoped NC-007. GitHub: the target repo is
-  **public, `main`, and empty** â€” this tree is the source. **No application code
+  **public, `main`, and empty** — this tree is the source. **No application code
   changed.**
 
-### [Phase 0] 2026-10-10 â€” Discovery & safety net (partial)
+### [Phase 0] 2026-10-10 — Discovery & safety net (partial)
 
 - **Gate:** Phase 0
 - **Area:** URL contract, local stack, DB bootstrap
-- **Status:** in progress â€” URL baseline done; the running-stack smoke test is
+- **Status:** in progress — URL baseline done; the running-stack smoke test is
   blocked by the sandbox (no Docker/Java/Maven/MySQL/clients)
 - **Views:** URL-INVENTORY.md, tools/*, TASK-PLAN.md, DECISIONS.md, PROGRESS.md
 - **Detail:** Captured the **live** behaviour and froze it.
@@ -96,17 +96,17 @@
   `tools/url-contract.ps1` + `tools/url-inventory/url-contract.json`.
   (b) Discovered and recorded: `/rcsearch/*` is **bot-only** (403 browser / 200
   Googlebot); aliases may be **empty or all dashes** (`/newspage/12247832ai-`);
-  the real sitemap is **`/sitemapindex.xml` â†’ `/sitemap_{n}.xml`**, 204 shards,
+  the real sitemap is **`/sitemapindex.xml` → `/sitemap_{n}.xml`**, 204 shards,
   ~2M URLs; imagery is on **`/custom/media*`** not only `/custom/images/`; meta
   description is **truncated ~155 chars**; **no JSON-LD** live; the site
   **rate-limits (429)**, so the harness throttles and retries. All in
   `URL-INVENTORY.md`; new decisions **D-024** (media bases) and **D-025**
-  (keep the legacy sitemap shard names â€” owner sign-off pending).
+  (keep the legacy sitemap shard names — owner sign-off pending).
   (c) Made `frontend/public/robots.txt` production-faithful (the invented
   `/sitemap.xml` + `sitemaps/` placeholders were **removed**).
   (d) Built the local-stack artifacts: `tools/local-stack/docker-compose.yml`
   (+README), `tools/db-load.ps1`, wildfly module/datasource
-  (`tools/wildfly/â€¦`), `tools/capture-sitemap.ps1`, raw evidence under
+  (`tools/wildfly/…`), `tools/capture-sitemap.ps1`, raw evidence under
   `tools/legacy-capture/` and `tools/sitemaps/`. **No application code changed.**
 ### [M2] 2026-10-10 - Record-system kit conformance
 - **Gate:** M2 Deliverable (+ M4 Reusable process)
@@ -325,3 +325,30 @@
   (b) **Encoding defect (NC-011, a recurrence of NC-009).** Appending the D-033..D-035 reminders to `CODE-FIX-PLAN.md` with PowerShell `Set-Content -Encoding UTF8` added a BOM and double-encoded the em-dashes. Restored the file from `06bf6de` (safe - no uncommitted work) and re-applied the edits with the `str_replace` editor; byte scan now clean. See `CAPA.md` NC-011.
   (c) **Kit self-check run.** All 10 record files exist; `AGENTS.md` states the project type; every `SOP-NNN`/`NC-NNN`/`D-NNN` pointer resolves; record-kit guard PASS.
 - **Open:** NC-009/NC-011 both stem from PowerShell writes to UTF-8 files; the standing rule (use `str_replace`; never `Set-Content`/`Out-File` on a tracked file) is recorded in CAPA and AGENTS.md.
+
+### [M2] 2026-10-13 - Phase 7 (part): admin auth foundation (JWT login, roles, public/private split)
+- **Gate:** M2 Deliverable (+ M1 for decision D-036)
+- **Area:** backend / auth / security
+- **Status:** done (backend foundation, verified end-to-end on the local stack); the React admin UI is still open.
+- **Views:** DECISIONS.md, CODE-FIX-PLAN.md, TASK-PLAN.md, BUILD-SPEC.md, PROGRESS.md, AGENTS.md, CAPA.md
+- **Detail:** Built the non-gated half of Phase 7 - the backend authentication foundation - so the admin area has a real login before the UI is wired.
+  (a) **Auth model (D-036).** Stateless Spring Security bearer JWTs (HS256, secret from `RCSITE_AUTH_JWT_SECRET`). Identity is `rc_customer.username`; roles resolve from `rc_customer.type` joined to `usertype.usertypeid -> usertypename` (no foreign key exists; the join is the numeric `type`). `POST /api/auth/login` mints a token (`sub`, `roles`, `name`, `email`, `iss`, `exp`); `GET /api/auth/me` re-reads the caller's identity. No schema change - `rc_customer` and `usertype` are read exactly as frozen (D-004/D-008).
+  (b) **Public/private split.** Public read paths stay anonymous: `/api/articles/**`, `/api/categories/**`, `/api/config/**`, `/api/search/**`, `/api/rss`, the sitemaps, `/swagger-ui/**`, `/v3/api-docs/**`. Everything else (e.g. `/api/feeds`) requires a bearer token; a missing/invalid token is 401 with the unified `ApiError` body.
+  (c) **NC-006 gate.** `LegacyPasswordVerifier` verifies an encoded value normally and **refuses** bare plaintext unless `rcsite.auth.allow-legacy-plaintext` is explicitly enabled. The default is OFF, so the frozen plaintext column cannot silently become the auth scheme. The owner-approved rehash/schema change (NC-006, D-004) is still **pending** and was not attempted.
+  (d) **Test blast radius fixed.** Adding the security starter made the four `@WebMvcTest` web slices fail with 401 under the default chain; `ArticleControllerTest`, `SearchControllerTest`, `FeedRssControllerTest` and `SitemapControllerTest` now use `@AutoConfigureMockMvc(addFilters = false)`, since they test MVC/content-negotiation, not security. Security itself is covered by `AuthFlowTest` (real chain: login -> bearer -> `/api/auth/me`; 401 on bad/absent token; public endpoints anonymous) and `LegacyPasswordVerifierTest`.
+  (e) **Verified.** `mvn test` -> **71/71 green** (57 -> 71: +14 auth tests). Live on the local stack (backend :8080 + MariaDB): `POST /api/auth/login` with the local demo user -> token; `GET /api/auth/me` with the token -> 200; `/api/feeds` with the token -> 200, without -> 401; `/api/articles`, `/api/rss`, `/sitemapindex.xml` anonymous -> 200. (The local demo user `demo` (role ADMIN) was inserted into the local `vivalanka` `usertype`/`rc_customer` rows for the demo; it is local demo data, not a schema change.)
+- **Open:** the React admin UI (article/category/feed/config screens) and wiring the bearer token into `frontend/`; media screens stay blocked on D-035. NC-006 rehash still needs owner approval.
+
+
+### [M3] 2026-10-13 - NC-012 charset repair: record files cleaned (double-encoding + BOMs)
+- **Gate:** M3 Defect (+ M4 for the new tool/SOP)
+- **Area:** records / record-kit conformance
+- **Status:** done
+- **Views:** CAPA.md, SKILLS.md, AGENTS.md, README.md, PROGRESS.md
+- **Detail:** Repaired the systemic encoding defect recorded as NC-012, at the owner's direction (option (a)).
+  (a) **Scale.** The committed record files held **312** UTF-8 double-encoding instances across 12 files, plus **4 BOMs** (`DATABASE.md`, `ARTICLES-HANDLING.md`, `URL-INVENTORY.md`, `SECURITY-NOTES.md`). `SKILLS.md` was the only clean file.
+  (b) **Repair.** A byte-level pass reversed each file (cp1252 -> utf-8), with a per-position longest-prefix fallback for characters cp1252 cannot encode (e.g. the `❌` cross mark), then stripped the BOMs. Result: **0** mojibake pairs, **0** BOMs, all 13 files valid UTF-8.
+  (c) **Safety.** Every file's **ASCII byte projection is byte-identical** to the pre-repair copy, so only corrupted non-ASCII bytes changed - no text was lost or reordered. (Backup taken before the write; files are outside git's working history for the uncommitted edits.)
+  (d) **Tool + rule (M4).** Added `tools/check-record-encoding.ps1` (raw-byte scan: fails on any `C3 A2`/`C2 A0` pair or UTF-8 BOM) and recorded the rule in AGENTS.md and `SKILLS.md` SOP-005. This defect class (NC-009/NC-011/NC-012) had fired three times, so the process is now written down and automated.
+- **Open:** none for the repair. The repaired files are part of the pending commit set.
+

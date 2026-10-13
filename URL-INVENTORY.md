@@ -1,4 +1,4 @@
-﻿# URL-INVENTORY.md
+# URL-INVENTORY.md
 
 **Duty:** the frozen, live-captured URL contract and the evidence behind it.
 
@@ -7,9 +7,9 @@ from the **live site** on 2026-10-10, not assumed from code.
 
 ## How the capture was done
 
-- `tools/url-contract.ps1` â€” harness; checks every frozen URL's status.
-- `tools/url-inventory/url-contract.json` â€” the frozen list (add URLs here).
-- `tools/capture-sitemap.ps1` â€” samples the real sitemaps to see URL shapes.
+- `tools/url-contract.ps1` — harness; checks every frozen URL's status.
+- `tools/url-inventory/url-contract.json` — the frozen list (add URLs here).
+- `tools/capture-sitemap.ps1` — samples the real sitemaps to see URL shapes.
 - Raw evidence kept under `tools/legacy-capture/` (robots, one live article,
   sitemap index) and `tools/sitemaps/` (shard list + sampled URLs).
 
@@ -35,7 +35,7 @@ search-category        exp 403  got 403  [bot 200]  <- /rcsearch/ is bot-only
 ## Findings that change the plan
 
 These are new facts found in Phase 0. They are **not** yet folded into
-`TASK-PLAN.md` â€” decision needed (see below).
+`TASK-PLAN.md` — decision needed (see below).
 
 ### 1. `/rcsearch/*` is bot-only
 `/rcsearch/news` returns **403 to a browser UA** and **200 to Googlebot**, and it
@@ -49,8 +49,8 @@ render the article. (The legacy `indexOf("ai-")` logic also survives these.)
 
 ### 3. Sitemaps: `<n>.xml` files, no underscore
 The live index is each of `/sitemapindex.xml` and `/sitemapindex04302022.xml`;
-they point at `/sitemap_{n}.xml` shards, n = **1â€¦212** (204 present), ~**10,047
-URLs each** â†’ roughly **2M URLs**. This does not match the three names proposed
+they point at `/sitemap_{n}.xml` shards, n = **1…212** (204 present), ~**10,047
+URLs each** → roughly **2M URLs**. This does not match the three names proposed
 earlier (`news-1.xml`, `categories.xml`, `pages.xml`). **Decision needed:** *new*
 sharded names vs *preserving* the `/sitemap_{n}.xml` scheme (the legacy shards
 would stop being generated at cutover, but existing crawled URLs would 404 if the
@@ -58,12 +58,12 @@ new app doesn't serve them).
 
 ### 4. Article imagery is on a different path
 Live current article uses
-`https://www.vivalanka.com/custom/media3/2026/10/<uuid>.png` â€” **not**
+`https://www.vivalanka.com/custom/media3/2026/10/<uuid>.png` — **not**
 `/custom/images/`. D-021 is corrected: keep `/custom/images/` as one base and add
 `/custom/media*` (D-024).
 
 ### 5. Meta description is truncated at ~155 chars
-The live `<meta name="Description">` is cut mid-word ("â€¦summoned the inves").
+The live `<meta name="Description">` is cut mid-word ("…summoned the inves").
 Reproduce the same truncation so the head matches.
 
 ### 6. No JSON-LD on the live article
@@ -83,7 +83,7 @@ a 429 is no longer mistaken for a contract break.
 |---|---|---|
 | `/newspage/{n}ai-{slug}` | ~30,016 | the dominant contract |
 | `/` (+ `?offset=`) | 5 | home + pagination |
-| `/user/login.jsp`, `/user/changelocation.jsp`, `/user/passwordrecovery.jsp?â€¦` | 1 each | user pages |
+| `/user/login.jsp`, `/user/changelocation.jsp`, `/user/passwordrecovery.jsp?…` | 1 each | user pages |
 | `/news/contactus.jsp`, `/directory/suggesturl.jsp` | 1 each | misc pages |
 
 Host is always `www.vivalanka.com`. Old shards use `http://`; new ones `https://`.

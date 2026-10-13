@@ -4,23 +4,23 @@
 
 Corrective and Preventive Action register.
 
-**One entry per nonconformity.** Nonconformity â†’ root cause â†’ corrective â†’
-preventive â†’ verification.
+**One entry per nonconformity.** Nonconformity → root cause → corrective →
+preventive → verification.
 
 **Format:**
 
-## NC-NNN â€” short title
+## NC-NNN — short title
 - **Status:** open | closed
 - **Found:** YYYY-MM-DD
 - **What went wrong:** the symptom observed
-- **Root cause:** why it actually happened â€” not the surface error
+- **Root cause:** why it actually happened — not the surface error
 - **Corrective action:** the fix applied
 - **Preventive action:** the rule/check that stops recurrence
 - **Verified:** how it was proven fixed, and when
 
 ## Register
 
-## NC-001 â€” Hardcoded credentials committed to source
+## NC-001 — Hardcoded credentials committed to source
 - **Status:** closed (accepted risk)
 - **Found:** 2026-10-10
 - **What went wrong:** real credential values are committed in
@@ -31,13 +31,13 @@ preventive â†’ verification.
   deliberately not reproduced here.)
 - **Root cause:** no single credential standard; the two connection files predate
   the config-driven approach and were never migrated.
-- **Corrective action:** none â€” the owner chose not to rotate or change them
+- **Corrective action:** none — the owner chose not to rotate or change them
   (D-023). The new stack does not use these files.
-- **Preventive action:** D-005 â€” the **new** stack keeps secrets out of git.
-- **Verified:** 2026-10-10 â€” closed by owner decision (D-023). Residual risk
+- **Preventive action:** D-005 — the **new** stack keeps secrets out of git.
+- **Verified:** 2026-10-10 — closed by owner decision (D-023). Residual risk
   accepted: the values remain in git history.
 
-## NC-002 â€” `log4jconfigfilepath` points at a file that is not in the repo
+## NC-002 — `log4jconfigfilepath` points at a file that is not in the repo
 - **Status:** open
 - **Found:** 2026-10-10
 - **What went wrong:** `ConfigServlet` configures logging from
@@ -45,13 +45,13 @@ preventive â†’ verification.
   exists in the repository.
 - **Root cause:** the logging config was expected on the server and never stored
   with the code; logging setup was never reproducible from the repo.
-- **Corrective action:** *(pending)* D-006 â€” the backend uses
+- **Corrective action:** *(pending)* D-006 — the backend uses
   `logback-spring.xml` committed to the repo.
 - **Preventive action:** logging configuration is version-controlled with the app.
 - **Verified:** *(pending)* the app starts with logging configured from the
   committed file.
 
-## NC-003 â€” Legacy production depends on a private artifact (`rcsiteJPA`)
+## NC-003 — Legacy production depends on a private artifact (`rcsiteJPA`)
 - **Status:** open
 - **Found:** 2026-10-10
 - **What went wrong:** `rcsiteweb/pom.xml` depends on
@@ -61,13 +61,13 @@ preventive â†’ verification.
   Neither is in the repo, so it cannot build standalone.
 - **Root cause:** the persistence layer was split into a private module with no
   public copy and no schema documentation.
-- **Corrective action:** *(pending)* D-002 â€” rebuild entities in the backend from
+- **Corrective action:** *(pending)* D-002 — rebuild entities in the backend from
   the live schema (`SHOW CREATE TABLE`).
 - **Preventive action:** the schema becomes the documented source of truth
   (`DATABASE.md`), and the build must not depend on private artifacts.
 - **Verified:** *(pending)* backend builds and reads a row from `articles`.
 
-## NC-004 â€” No automated tests in the legacy repo
+## NC-004 — No automated tests in the legacy repo
 - **Status:** open
 - **Found:** 2026-10-10
 - **What went wrong:** there are zero test sources (`*Test.java`) and no test
@@ -80,14 +80,14 @@ preventive â†’ verification.
   URL-contract suite runs in CI.
 - **Verified:** *(pending)* CI runs the suites green.
 
-## NC-005 â€” SQL injection in the legacy JSPs (and credential in the repo)
+## NC-005 — SQL injection in the legacy JSPs (and credential in the repo)
 - **Status:** open
 - **Found:** 2026-10-10
 - **What went wrong:** login and other paths build SQL by string concatenation,
   e.g. `ROOT/user/login.jsp`:
   `SELECT ... FROM rc_customer WHERE username='<input>' AND pword='<input>'`
       with only `'` stripped. `ROOT/user/loginnew.jsp` does the same
-    (`SELECT username FROM rc_customer WHERE username='" + â€¦`). Similar patterns
+    (`SELECT username FROM rc_customer WHERE username='" + …`). Similar patterns
     appear in many `administrator/*.jsp`. **Confirmed with evidence in Phase 0**
     (`SECURITY-NOTES.md` S-2).
 - **Root cause:** scriptlet-era code with no parameterised queries.
@@ -98,7 +98,7 @@ preventive â†’ verification.
 - **Verified:** *(pending)* all repository queries parameterised; a security
   review sign-off.
 
-## NC-006 â€” Passwords stored in plaintext in a 20-char column
+## NC-006 — Passwords stored in plaintext in a 20-char column
 - **Status:** open (confirmed with evidence, Phase 0)
 - **Found:** 2026-10-10
 - **What went wrong:** `rc_customer.pword` is `varchar(20)`. A 20-char field
@@ -110,12 +110,12 @@ preventive â†’ verification.
 - **Root cause:** legacy schema and login flow predate password-hashing standards.
 - **Corrective action:** *(pending)* verify how existing passwords are stored
   **before** designing the new auth; if weak, plan a migration-day rehash (needs a
-  schema change â‡’ owner approval, D-004).
+  schema change ⇒ owner approval, D-004).
 - **Preventive action:** new auth stores bcrypt/argon2 hashes in an
   appropriately sized column (new column, owner-approved).
 - **Verified:** *(pending)* a security review of the auth flow.
 
-## NC-007 â€” Credentials file outside the repo is not a CI/CD source of truth
+## NC-007 — Credentials file outside the repo is not a CI/CD source of truth
 - **Status:** open (accepted)
 - **Found:** 2026-10-10
 - **What went wrong:** the owner's live credentials are in
@@ -128,7 +128,7 @@ preventive â†’ verification.
 - **Preventive action:** no secret in any tracked file; `credentials/` gitignored.
 - **Verified:** *(pending)* the app starts with no secret-bearing file in the repo.
 
-## NC-008 â€” Schema is not reproducible from the repo alone (resolved)
+## NC-008 — Schema is not reproducible from the repo alone (resolved)
 - **Status:** closed
 - **Found:** 2026-10-10
 - **What went wrong:** the repo had seed `INSERT`s but no DDL, so the schema could
@@ -137,7 +137,7 @@ preventive â†’ verification.
 - **Corrective action:** the owner supplied `rcsiteweb/db/dbschema.sql` (the full
   DDL). `DATABASE.md` now documents all 31 tables.
 - **Preventive action:** the schema stays documented in `DATABASE.md`; there is\n  no migration tool - `dbschema.sql` is the single DDL source, loaded as-is (D-004).
-- **Verified:** 2026-10-10 â€” all 31 `CREATE TABLE` statements catalogued and
+- **Verified:** 2026-10-10 — all 31 `CREATE TABLE` statements catalogued and
   cross-checked against `DATABASE.md`.
 
 ## NC-009 -- PowerShell in-place edits corrupted record-file encoding
@@ -166,3 +166,13 @@ preventive â†’ verification.
 - **Corrective action:** restored the clean file from the last good commit (`git checkout 06bf6de -- CODE-FIX-PLAN.md`) - safe here because no uncommitted work existed - and re-applied all three edits with the `str_replace` file editor. Re-verified: no BOM (first bytes `23 20 43`), em-dashes are proper U+2014, no `C3 A2` mojibake.
 - **Preventive action:** reinforces NC-009 - **never** `Set-Content`/`Out-File`/`Add-Content` on any tracked text file; use the `str_replace` editor for all record edits. If a byte-level write is unavoidable, use `[System.IO.File]::WriteAllText(path, text, New-Object System.Text.UTF8Encoding($false))`. Before committing record files, scan for a BOM and for the `C3 A2` sequence.
 - **Verified:** 2026-10-13 -- `CODE-FIX-PLAN.md` byte scan clean (no BOM, U+2014 present); `tools/check-record-kit.ps1` PASS; all record files re-checked for BOM/mojibake.
+
+## NC-012 -- Double-encoded non-ASCII text in the committed record files (systemic)
+- **Status:** closed (repaired 2026-10-13, option (a); tooling added)
+- **Found:** 2026-10-13 (during the Phase 7 auth record update)
+- **What went wrong:** the committed record files contain systemic UTF-8 double-encoding (UTF-8 bytes read as CP1252 and re-encoded): `E2 80 94` (em dash) is stored as `C3 A2 C2 80 C2 94` (`a-hat`, `euro`, `quote`), and `E2 86 99` (arrow) as `C3 A2 E2 82 AC E2 80 99`. Measured at `HEAD` by raw byte scan: `AGENTS.md` 48, `TASK-PLAN.md` 56, `DECISIONS.md` 33, `ARTICLES-HANDLING.md` 33, `DATABASE.md` 28, `CODE-FIX-PLAN.md` 25, `CAPA.md` 22, `README.md` 20, `PROGRESS.md` 19, `SECURITY-NOTES.md` 15, `URL-INVENTORY.md` 9, `BUILD-SPEC.md` 4 - **312 instances across 12 files**. `DATABASE.md`, `ARTICLES-HANDLING.md`, `URL-INVENTORY.md` and `SECURITY-NOTES.md` also begin with a UTF-8 BOM. (Example: a repo-wide `grep` may miss these; the byte sequence is what matters.)
+- **Root cause:** the NC-009 / NC-011 write path (PowerShell `Set-Content`/`Out-File` on files that were not UTF-8-on-disk) was applied to the record files across several sessions, and the corruption was committed. The NC-009/NC-011 "byte scan clean" claims were themselves run through the corrupting PowerShell pipeline, so they were **false passes** - the defect was never actually absent.
+- **Corrective action:** owner chose **option (a)**. A byte-level repair reversed the double-encoding on all 13 record files (`text.encode -> utf-8`, with a per-position longest-prefix fallback for characters cp1252 cannot encode, e.g. `❌`), and stripped the 4 BOMs. Result: 310 `C3 A2` instances + 2 stragglers (`C2 A0`/`C2 9D`) -> **0**; BOMs -> 0. Invariant check: every file's ASCII byte projection is **identical** to before, so only corrupted non-ASCII bytes changed. Tool added: `tools/check-record-encoding.ps1` (SOP-005).
+- **Preventive action:** scan with a real byte reader, not through PowerShell string cmdlets (use `[System.IO.File]::ReadAllBytes`); run `tools/check-record-encoding.ps1` after editing a record file and before committing. Edit record files with the `str_replace` editor or `[System.IO.File]::WriteAllText($p,$t,New-Object System.Text.UTF8Encoding($false))` - never `Set-Content`/`Out-File`/`Add-Content`.
+- **Verified:** 2026-10-13 -- raw-byte scan: 0 `C3 A2`/`C2 A0`, 0 BOM, all 13 files valid UTF-8; ASCII skeletons byte-identical to the pre-repair copies; `tools/check-record-encoding.ps1` -> PASS; `tools/check-record-kit.ps1` -> PASS; `mvn test` 71/71.
+

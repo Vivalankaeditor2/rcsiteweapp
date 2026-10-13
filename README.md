@@ -1,4 +1,4 @@
-# VivaLanka.com (rcsiteweb â†’ Next.js + Spring Boot revamp)
+# VivaLanka.com (rcsiteweb → Next.js + Spring Boot revamp)
 
 **Duty:** the front door - what this is, how to run it, and the external-service registry (names only).
 
@@ -24,33 +24,38 @@ world news, community news, events, charities and sports. The full schema is in
 Exact commands per piece are added as each piece is built (see `TASK-PLAN.md`).
 
 - Frontend (`frontend/`): `npm install && npm run dev` **[to be created]**
-- Backend (`backend/`): `./mvnw spring-boot:run` **[to be created]**
+- Backend (`backend/`): `mvn spring-boot:run` (dev, embedded Tomcat). Admin auth
+  needs `RCSITE_AUTH_JWT_SECRET` (JWT signing secret) and, only while
+  `rc_customer.pword` is still plaintext, `AUTH_ALLOW_LEGACY_PLAINTEXT=true`
+  (NC-006). Login: `POST /api/auth/login` `{username,password}` - returns a bearer
+  token; `GET /api/auth/me` re-reads the caller (D-036).
 - Local infra: `docker compose up` (DB + Solr) **[to be created]**
 - Legacy (reference only, needs its private deps): build in `rcsiteweb/` with
-  `mvn clean package` â€” not runnable standalone from this repo (CAPA NC-003).
+  `mvn clean package` — not runnable standalone from this repo (CAPA NC-003).
 
 ## Layout
 
-- `frontend/` â€” Next.js (React) app.
-  - `frontend/public/robots.txt`, `sitemap.xml`, `sitemaps/*.xml` â€” SEO discovery.
-- `backend/` â€” Spring Boot WAR (Java 17, WildFly 27).
+- `frontend/` — Next.js (React) app.
+  - `frontend/public/robots.txt`, `sitemap.xml`, `sitemaps/*.xml` — SEO discovery.
+- `backend/` — Spring Boot WAR (Java 17, WildFly 27).
   - `backend/pom.xml` - WAR build: Spring Boot 3, Java 17, WildFly 27 (D-017).
   - `backend/src/main/java/com/rev_creations/rcsite/` - entities, repositories,
     DTOs, MapStruct mappers, services, REST controllers (`/api/...`).
-  - `backend/src/test/.../architecture/ForbiddenTableUsageTest.java` â€” forbidden-table guard.
-- `tools/check-forbidden-tables.ps1` â€” same guard for CI.
+  - `backend/src/test/.../architecture/ForbiddenTableUsageTest.java` — forbidden-table guard.
+- `tools/check-forbidden-tables.ps1` — same guard for CI.
 - `tools/check-record-kit.ps1` - checks the record set against the kit (SOP-004).
-- `credentials/` â€” local secrets, gitignored; only `*.example` templates tracked.
-- `ARTICLES-HANDLING.md` â€” MyISAM rules, URL options, SEO strategy.
-- `URL-INVENTORY.md` â€” the frozen, live-captured URL contract (Phase 0).
-- `SECURITY-NOTES.md` â€” the legacy security audit (Phase 0).
-- `tools/url-contract.ps1` â€” checks every frozen URL's status.
-- `rcsiteweb/` â€” legacy app (read-only reference): `pom.xml`, `src/`, `ROOT/`,
-  `db/dbschema.sql` (full DDL), `db/001â€“016` (seed), `bin/`.
-- `claude/` â€” assistant rules (note: `project-level-claude.md` is an unrelated
+- `tools/check-record-encoding.ps1` - checks the record files for BOM/double-encoding (SOP-005).
+- `credentials/` — local secrets, gitignored; only `*.example` templates tracked.
+- `ARTICLES-HANDLING.md` — MyISAM rules, URL options, SEO strategy.
+- `URL-INVENTORY.md` — the frozen, live-captured URL contract (Phase 0).
+- `SECURITY-NOTES.md` — the legacy security audit (Phase 0).
+- `tools/url-contract.ps1` — checks every frozen URL's status.
+- `rcsiteweb/` — legacy app (read-only reference): `pom.xml`, `src/`, `ROOT/`,
+  `db/dbschema.sql` (full DDL), `db/001–016` (seed), `bin/`.
+- `claude/` — assistant rules (note: `project-level-claude.md` is an unrelated
   "ecommerce-api" and is not authoritative here).
-- `zenodo/` â€” the record-system kit.
-- Root `*.md` â€” the record system (see `AGENTS.md`).
+- `zenodo/` — the record-system kit.
+- Root `*.md` — the record system (see `AGENTS.md`).
 
 ## Dependencies & external services
 
@@ -58,16 +63,17 @@ Exact commands per piece are added as each piece is built (see `TASK-PLAN.md`).
 |------|----------|------------------|-------|
 | MariaDB 10.6 database `vivalanka` | application data (schema frozen) | legacy JNDI `jdbc/rcsite`; new backend reads `DB_*` env vars | site owner |
 | Apache Solr | site search `/rcsearch/*` | legacy `search.*` config; new backend `SEARCH_*` env vars | site owner |
-| YouTube feeds (VivaLanka playlists) | video content | `feed_channel` rows in `rcsiteweb/db/014-016` | â€” |
+| YouTube feeds (VivaLanka playlists) | video content | `feed_channel` rows in `rcsiteweb/db/014-016` | — |
 | SMTP mail server | outbound email | legacy `emailhost`/`emailport`; new backend `SMTP_*` env vars | site owner |
-| MaxMind GeoIP | visitor location lookup | `rcsiteweb/src/com/maxmind/geoip/`; `geo_*` tables | â€” |
+| MaxMind GeoIP | visitor location lookup | `rcsiteweb/src/com/maxmind/geoip/`; `geo_*` tables | — |
 | IIS + WildFly 27 host | app hosting | owner-managed (D-007) | site owner |
+| Admin auth (JWT) | admin-area sign-in (D-036) | `RCSITE_AUTH_JWT_SECRET`; identity read from `rc_customer` | site owner |
 | Existing CI/CD pipeline | build & deploy + secret store | owner-managed (not in this repo) | site owner |
 
 Dropped from the new stack: AI article generation (D-010) and the commerce
 storefront (D-009).
 
-**Rule: this table holds names and locations â€” never secrets or passwords.**
+**Rule: this table holds names and locations — never secrets or passwords.**
 Real values live in `credentials/` (gitignored) or the owner's
 `C:\allcredentials\Credentials.md` (outside the repo), and are injected as env
 vars at run time.
