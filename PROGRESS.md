@@ -373,3 +373,12 @@
 - **Views:** PROGRESS.md, CODE-FIX-PLAN.md, BUILD-SPEC.md, TASK-PLAN.md, CAPA.md
 - **Detail:** Committed the Phase 7 admin panel (backend admin/write API + React UI), the admin-screenshot capture script and the eight `screenshots/`, this record update, `zenodo/RECORD-KIT-CONFORMANCE.md`, and a `.gitignore` entry for the local `frontend/next-start.err` runtime log. Pushed to `origin/main`.
 
+### [M2] 2026-10-13 - Phase 8 start: CI gate (verified locally, push triggers it)
+
+- **Gate:** M2 Deliverable
+- **Area:** ci
+- **Status:** in-progress (workflow added; first remote run triggers on this push)
+- **Views:** TASK-PLAN.md, CODE-FIX-PLAN.md, DECISIONS.md, BUILD-SPEC.md, AGENTS.md
+- **Detail:** Added the Phase 8 CI/CD item - `.github/workflows/ci.yml` (D-037) with three server-independent jobs: **backend** (Java 17 `mvn -B -ntp test`, H2 in-memory), **frontend** (Node 22 `npm ci` + `npm test` + `tsc --noEmit` + `npm run build`, with `BACKEND_URL` unreachable so the build stays CI-safe), and **records** (`tools/check-record-kit.ps1` + `tools/check-record-encoding.ps1` under `shell: pwsh`). Every step was run locally first and is green; the workflow itself has not run on a GitHub runner yet - the push that carries it triggers the first run (`gh run list` once available).
+- **Open:** the remaining Phase 8 items are owner-gated (IIS/TLS/DNS, Search Console, load test on a production host); the rendered URL contract stays out of CI because it needs a live stack (D-032).
+

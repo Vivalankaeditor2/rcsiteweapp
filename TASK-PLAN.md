@@ -285,10 +285,17 @@ back through the public API.
 
 ## Phase 8 — Cutover
 
+- [x] CI/CD pipeline: GitHub Actions gate on every push/PR - backend `mvn test`,
+      frontend test + typecheck + build, record-kit conformance + encoding
+      (D-037; `.github/workflows/ci.yml`).
 - [ ] IIS keeps the WordPress site on `/slcommunity/` and reverse-proxies the app
-      paths + `/api` to WildFly; TLS; caching (D-007).
+      paths + `/api` to WildFly; TLS; caching (D-007). **Owner-gated:** needs the
+      production host, TLS cert and DNS.
 - [ ] Observability (metrics, logs, alerts), load test, CI/CD pipeline update.
+      **Partly done:** the CI gate above is the "pipeline update"; actuator/
+      Prometheus metrics and the load test need the staging/production host.
 - [ ] Search Console re-verify; monitor 404/5xx; decommission legacy.
+      **Owner-gated:** needs Search Console access and the production host.
 
 **Smoke test (end of Phase 8):** full end-to-end run on a staging domain;
 sampled indexed URLs all 200 with identical canonicals; Core Web Vitals pass;

@@ -460,3 +460,23 @@ references the old one (for example: "supersedes the earlier entry it names").
   plaintext by default rather than by changing the column.
 - **Revisit if:** the owner wants refresh tokens or a session store, `usertype`
   names need remapping to authorities, or the NC-006 rehash migration is approved.
+
+## D-037 - CI proves backend tests, frontend tests/build and record conformance on every push
+- **Decided:** 2026-10-13
+- **Decision:** GitHub Actions (`.github/workflows/ci.yml`) runs three
+  server-independent jobs on every push to `main` and every PR: **backend**
+  (Java 17, `mvn -B -ntp test` against the H2 in-memory test schema), **frontend**
+  (Node 22, `npm ci` + `npm test` + `npx tsc --noEmit` + `npm run build`), and
+  **records** (`tools/check-record-kit.ps1` and `tools/check-record-encoding.ps1`
+  via `shell: pwsh`). CI never touches the frozen database and needs no secrets.
+  The rendered URL contract stays out of CI: `tools/url-contract.ps1` needs a
+  running stack (D-032).
+- **Options considered:** (a) manual local runs only; (b) GitHub Actions with the
+  three server-independent jobs; (c) a full pipeline including a MariaDB service
+  and a deployed stack.
+- **Why:** (b) catches the highest-severity regressions (broken build, failing
+  tests, a record-file encoding defect) on every push with no infrastructure;
+  the backend tests are H2-only by design, so no DB service is required.
+- **Revisit if:** the contract harness can run against a review environment, or
+  the owner wants deployment/publish steps (then extend, keeping the frozen-schema
+  rule).

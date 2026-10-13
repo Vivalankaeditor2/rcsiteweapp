@@ -184,6 +184,9 @@ Never edit history to settle a disagreement - add a new entry.
 - **Backend deploy (WildFly 27 at ``C:\rev-crea\wildfly-27.0.0.Final``):** start ``standalone.bat`` with ``SPRING_PROFILES_ACTIVE=wildfly``; copy ``backend\target\rcsite-backend.war`` into ``standalone\deployments\``. Context root is ``/`` (``jboss-web.xml``); datasource JNDI ``java:/jdbc/rcsite``.
 - **Caveat:** the seeds (``rcsiteweb/db/001-016``) contain **config/feed rows only** - no ``articles`` and no categories, so list endpoints are empty until real data is loaded.
 
+## CI (GitHub Actions, D-037)
+- ``.github/workflows/ci.yml`` runs three server-independent jobs on every push to ``main`` and every PR: **backend** (Java 17, ``mvn -B -ntp test`` against H2), **frontend** (Node 22: ``npm ci`` -> ``npm test`` -> ``npx tsc --noEmit`` -> ``npm run build``), and **records** (``tools/check-record-kit.ps1`` + ``tools/check-record-encoding.ps1`` under ``shell: pwsh``). It needs no secrets and never touches the frozen DB. ``tools/url-contract.ps1`` stays out of CI (needs a live stack, D-032).
+
 ## Frontend + end-to-end verification (verified 2026-10-12)
 - **Frontend:** Node v22.12.0 / npm 10.9.0; Next.js 14.2.35 in ``frontend/``. ``npm install`` -> ``npm run build`` -> ``npm test`` (node:test via tsx; 23 tests) -> ``npm run start`` serves on :3000 and rewrites the API, sitemap and ``/rss`` paths to the backend (``BACKEND_URL``, default ``http://localhost:8080``).
 - **Full local stack (Phase 2 smoke test):** load the schema/seed, run the backend (``mvn spring-boot:run``) and ``next start``; the frontend proxies ``/api/*``, ``/rss``, ``/sitemapindex.xml``, ``/sitemapindex04302022.xml`` and ``/sitemap_{n}.xml`` to the backend. ``/robots.txt`` is served statically from ``frontend/public/robots.txt`` (byte-identical to production, 834 B).

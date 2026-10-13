@@ -30,6 +30,7 @@ Target deliverables for the revamp. Status `specified` = planned, not yet built.
 | 17 | `backend/` `logback-spring.xml` (SLF4J + Logback) | replace the legacy log4j 1.2 (NC-002) | logging config loads; no log4j on the classpath | as-built-verified (logs clean on WildFly) |
 | 18 | Paged article listing `GET /api/articles?page&size&categoryId` (+ `PageDto`) | feed listings/feeds from `articles` | page envelope; invalid `page`/`size` -> 400; newest-first | as-built-verified (200 via frontend; service + controller tests green) |
 | 19 | Frontend Phase 3 shell: header/footer, brand tokens, home listing, restyled article | a branded, responsive, SEO-preserving UI | home + article 200; legacy head byte-identical; a11y signals present | as-built-verified (routes + head asserted on the local stack) |
+| 20 | CI gate `.github/workflows/ci.yml` (backend tests, frontend test/typecheck/build, record conformance) | fail a push that breaks build, tests or records | every listed step passes locally; the workflow runs on push/PR | as-built-verified (all steps run green locally; first GitHub run triggers on push, D-037) |
 
 ## Decisions that shape the build
 

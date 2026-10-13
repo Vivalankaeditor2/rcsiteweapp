@@ -37,6 +37,7 @@ happen next, this file wins.
 | 23 | Media: image upload/resize (`ImageHelper`/`Scalr`) | blocked | D-035; needs an owner storage decision **and** Phase 7 auth - an unauthenticated upload is an arbitrary-file-write hole |
 | 24 | Backend: Spring Security + JWT auth foundation (`POST /api/auth/login`, `GET /api/auth/me`, roles from `usertype`) | done | D-036; `rc_customer` reused as-is (no schema change); `LegacyPasswordVerifier` refuses plaintext unless allowed (NC-006); `mvn test` 71/71 green |
 | 25 | Frontend: React admin UI (article/category/feed/config screens; drop commerce) | done | TASK-PLAN Phase 7; JWT (bearer) wired into `frontend/`; `npm test` 26/26, `tsc` 0, `next build` ok; E2E create->edit->hide->publish->public read 200; media screens depend on item 23 (D-035) |
+| 26 | CI/CD: GitHub Actions gate (backend tests, frontend test/typecheck/build, record conformance) | done | D-037; `.github/workflows/ci.yml`; server-independent (H2 + `node:test` + the two pwsh checkers); the rendered URL contract stays out (needs a live stack, D-032) |
 
 ## Locked technical decisions
 
