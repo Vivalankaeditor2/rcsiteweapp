@@ -148,3 +148,12 @@ preventive â†’ verification.
 - **Corrective action:** restored the deleted AGENTS.md sections from the pre-checkout read; re-applied edits with the str_replace file editor and with [System.IO.File] UTF-8 (no-BOM) byte-level writes; stripped the BOM from DECISIONS.md; removed the mojibake literal from this file; and corrected an overstated claim (page = 0 is valid; the guard is page >= 0 and size 1-100).
 - **Preventive action:** for existing files prefer the str_replace file editor; if a scripted write is unavoidable read and write with an explicit UTF8Encoding($false) and never Out-File/Set-Content/Add-Content on a file that is not already UTF-8. Never git checkout/git restore to undo a local edit while uncommitted work exists - read it first or commit it first.
 - **Verified:** 2026-10-12 -- BOM/mojibake scan of all touched record files is clean; AGENTS.md content restored; tools/check-record-kit.ps1 -> PASS.
+
+## NC-010 -- Cannot push to the target repository (GitHub token is read-only)
+- **Status:** open
+- **Found:** 2026-10-12
+- **What went wrong:** the first delivery push to https://github.com/Vivalankaeditor2/rcsiteweapp failed with HTTP 403. The fine-grained PAT authenticates as the right account and the repo reports push=true, but every write is refused: POST /git/blobs -> 403 "Resource not accessible by personal access token". The token therefore lacks the fine-grained "Contents: Read and write" (repository) permission.
+- **Root cause:** the credential used for the push is a fine-grained PAT scoped to read, or to a selected repository set that excludes rcsiteweapp. No GITHUB_TOKEN is exported to the shell, and the Windows credential-store entries for github.com are also insufficient-403.
+- **Corrective action:** committed the pending work locally as three logical commits so nothing is at risk; recorded the exact blocker (PROGRESS [M6]) so the push can be resumed once a writable credential exists.
+- **Preventive action:** keep delivery credentials least-privilege, but provision the CI/deploy token with Contents: Read and write on the target repo and verify it with a dry-run push before a delivery session. Never store a PAT in .git/config; use the credential helper or an ephemeral remote URL.
+- **Verified:** *(pending)* a successful `git push -u origin main` with a writable credential.
