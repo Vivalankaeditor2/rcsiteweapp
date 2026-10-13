@@ -5,6 +5,7 @@ import com.rev_creations.rcsite.exception.ResourceNotFoundException;
 import com.rev_creations.rcsite.service.ArticleService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 // Web-layer test: real Spring MVC + the unified error handler, service mocked.
 @WebMvcTest(ArticleController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class ArticleControllerTest {
     @Autowired
     private MockMvc mockMvc;

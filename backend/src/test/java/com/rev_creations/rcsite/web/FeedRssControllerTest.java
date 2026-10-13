@@ -3,6 +3,7 @@ package com.rev_creations.rcsite.web;
 import com.rev_creations.rcsite.service.FeedRssService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 // Web-layer test: real Spring MVC and content negotiation; the RSS renderer is
 // mocked. Confirms the public path and the RSS content type.
 @WebMvcTest(FeedRssController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class FeedRssControllerTest {
 
     @Autowired
